@@ -8,5 +8,6 @@
   { "key":"friction_product_extras", "name":"Friction: WhatsApp button and info accordions", "inherit":"website_sale.product", "file":"product_extras.xml" },
   { "key":"friction_confirmation", "name":"Friction: enquiry received wording", "inherit":"website_sale.confirmation", "file":"confirmation.xml" },
   { "key":"friction_cart_title", "name":"Friction: Your enquiry bag title", "inherit":"website_sale.cart", "file":"cart_title.xml" },
+  { "key":"friction_empty_bag", "name":"Friction: empty enquiry bag wording", "inherit":"website_sale.cart_lines", "file":"empty_bag.xml" },
   { "key":"friction_payment_heading", "name":"Friction: Review and send heading on the last step", "inherit":"website_sale.payment", "file":"payment_heading.xml" }
 ]

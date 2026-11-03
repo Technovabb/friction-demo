@@ -1,0 +1,5 @@
+<data name="Friction empty enquiry bag">
+  <xpath expr="//h5[contains(., 'Your cart is empty')]" position="replace">
+    <h5 class="mb-3" style="text-align: center;">Your enquiry bag is empty.</h5>
+  </xpath>
+</data>
