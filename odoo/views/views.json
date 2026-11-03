@@ -9,6 +9,7 @@
   { "key":"friction_card_cta", "name":"Friction: Check Price & Availability on shop cards", "inherit":"website_sale.shop_product_buttons", "file":"card_cta.xml" },
   { "key":"friction_card_tag", "name":"Friction: Styled Look tag on product cards", "inherit":"website_sale.product_title_and_details", "file":"card_tag.xml" },
   { "key":"friction_header_bag", "name":"Friction: Enquiry Bag link in the header", "inherit":"website_sale.header_cart_link", "file":"header_bag.xml" },
+  { "key":"friction_no_brand_promotion", "name":"Friction: no Powered by Odoo line (paid plans only)", "inherit":"web.brand_promotion", "file":"no_brand_promotion.xml" },
   { "key":"friction_footer_help", "name":"Friction: customer care links (published pages only)", "inherit":"website.layout", "file":"footer_help.xml" },
   { "key":"friction_product_extras", "name":"Friction: WhatsApp button and info accordions", "inherit":"website_sale.product", "file":"product_extras.xml" },
   { "key":"friction_confirmation", "name":"Friction: enquiry received wording", "inherit":"website_sale.confirmation", "file":"confirmation.xml" },

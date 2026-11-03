@@ -1,0 +1,3 @@
+<data name="Friction: no Powered by Odoo line on this website">
+  <xpath expr="//div[hasclass('o_brand_promotion')]" position="replace"/>
+</data>
