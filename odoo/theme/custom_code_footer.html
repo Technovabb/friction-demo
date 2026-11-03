@@ -88,6 +88,9 @@
       };
       refresh();
       if (sel) sel.addEventListener('change', refresh);
+      // Odoo rewrites its contact button link after load, so set ours again then and on every press
+      window.addEventListener('load', function () { setTimeout(refresh, 300); });
+      document.querySelectorAll('.fr-check, .fr-wa-look').forEach(function (a) { a.addEventListener('pointerdown', refresh); a.addEventListener('click', refresh); });
       document.querySelectorAll('.fr-bag-add').forEach(function (b) {
         b.addEventListener('click', function () {
           var items = load(), s = size(), id = String(b.getAttribute('data-pid'));
