@@ -1,0 +1,5 @@
+<data name="Friction wordmark">
+  <xpath expr="//a[@data-name='Navbar Logo']" position="replace">
+    <a data-name="Navbar Logo" href="/" t-attf-class="navbar-brand fr-wordmark #{_link_class}" aria-label="Friction Clothing Barbados, home"><span class="fr-wm-a">FRICTION</span><span class="fr-wm-b">CLOTHING</span></a>
+  </xpath>
+</data>

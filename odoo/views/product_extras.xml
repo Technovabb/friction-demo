@@ -1,0 +1,25 @@
+<data name="Friction product extras">
+  <xpath expr="//div[@id='o_wsale_product_cta_section']" position="after">
+    <div class="fr-pextra">
+      <a class="fr-btn fr-btn-wa fr-wa-look" href="https://wa.me/12466221748" target="_blank" rel="noopener" t-att-data-look="product.name">Ask about this look on WhatsApp</a>
+      <div class="fr-acc">
+        <details>
+          <summary>Product details</summary>
+          <div>
+            <p>Product details coming soon. Brand, the pieces included, materials and care will be added from Friction's approved catalogue.</p>
+            <p t-if="product.description_sale">Seen in the photo: <t t-out="product.description_sale"/>.</p>
+          </div>
+        </details>
+        <details>
+          <summary>Sizing</summary>
+          <div><p>Message us for current sizes. The size buttons above are for this demo only: size availability to confirm.</p></div>
+        </details>
+        <details>
+          <summary>Collection &amp; delivery</summary>
+          <div><p>Final information pending. Friction will confirm collection at The Dome Mall, Warrens, and any delivery options when they reply to your enquiry. No payment is taken online.</p></div>
+        </details>
+      </div>
+      <p class="fr-demo-note">Client demo: working look name. Price, sizes and stock await Friction's approval.</p>
+    </div>
+  </xpath>
+</data>

@@ -1,0 +1,63 @@
+<!-- Friction demo: WhatsApp helpers (Tech Nova). Only builds wa.me links; sends nothing by itself. -->
+<script>
+(function () {
+  'use strict';
+  var WA = 'https://wa.me/12466221748';
+  function waLink(text) { return WA + '?text=' + encodeURIComponent(text); }
+  function ready(fn) { if (document.readyState !== 'loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
+  ready(function () {
+    if (document.body.classList.contains('editor_enable')) return;
+
+    // Floating WhatsApp button on every page
+    if (!document.querySelector('.fr-wa-float')) {
+      var f = document.createElement('a');
+      f.className = 'fr-wa-float';
+      f.href = waLink("Hi Friction, I'm on your website and would like some help.");
+      f.target = '_blank'; f.rel = 'noopener';
+      f.setAttribute('aria-label', 'Chat with Friction on WhatsApp');
+      document.body.appendChild(f);
+    }
+
+    // Product page: "Ask about this look" carries the look name and the size button picked (no price or stock claims)
+    document.querySelectorAll('.fr-wa-look').forEach(function (a) {
+      var look = a.getAttribute('data-look') || (document.querySelector('h1') || {}).textContent || 'this look';
+      function size() {
+        var form = a.closest('#product_detail') || document;
+        var picked = form.querySelector('.variant_attribute input:checked, .js_product input[type="radio"]:checked');
+        if (!picked) return '';
+        var label = picked.getAttribute('data-value-name') || (picked.closest('li, label') || picked.parentElement || {}).textContent || '';
+        label = String(label).trim();
+        return label ? ' in size ' + label : '';
+      }
+      function update() {
+        a.href = waLink("Hi Friction, I'm interested in the " + look.trim() + size() + " from your website. Is it available?");
+      }
+      update();
+      a.addEventListener('mousedown', update);
+      a.addEventListener('touchstart', update, { passive: true });
+      a.addEventListener('keydown', update);
+    });
+
+    // Enquiry bag: offer to send the looks in the bag over WhatsApp as well
+    if (/^\/shop\/cart\/?$/.test(location.pathname)) {
+      var names = [];
+      document.querySelectorAll('#cart_products .o_cart_product h6, #cart_products .o_cart_product a.h6, #cart_products [name="o_wsale_cart_line_name"], .o_cart_product strong').forEach(function (el) {
+        var t = el.textContent.trim(); if (t && names.indexOf(t) < 0) names.push(t);
+      });
+      var host = document.querySelector('#shop_cart');
+      if (names.length && host && !document.querySelector('.fr-bag-wa')) {
+        var box = document.createElement('div');
+        box.className = 'fr-bag-wa';
+        box.innerHTML = '<p>Prefer to chat? Send these looks to the team on WhatsApp.</p>';
+        var b = document.createElement('a');
+        b.className = 'fr-btn fr-btn-wa';
+        b.target = '_blank'; b.rel = 'noopener';
+        b.textContent = 'Send my bag on WhatsApp';
+        b.href = waLink("Hi Friction, I'd like to check availability and sizes for: " + names.join('; ') + '.');
+        box.appendChild(b);
+        host.appendChild(box);
+      }
+    }
+  });
+})();
+</script>

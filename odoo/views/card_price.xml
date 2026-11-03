@@ -1,0 +1,5 @@
+<data name="Friction card price">
+  <xpath expr="//div[hasclass('product_price')]" position="replace">
+    <div class="product_price fr-por-card" aria-label="Price information">Price on request</div>
+  </xpath>
+</data>

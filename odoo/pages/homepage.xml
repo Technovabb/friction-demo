@@ -1,0 +1,70 @@
+<section class="fr-hero" data-name="Friction hero">
+  <img class="fr-hero-img" src="__PIMGL:12__" alt="WKND Riot White Look: white graphic tee, black ripped denim, red cap and white-and-red sneakers laid flat" fetchpriority="high"/>
+  <div class="fr-hero-shade"></div>
+  <div class="fr-hero-copy">
+    <p class="fr-eyebrow">The Dome Mall · Warrens · Barbados</p>
+    <h1 class="fr-display">Options<br/>look good<br/>on you.</h1>
+    <p class="fr-hero-lead">Fresh fits, confident layers and head-to-toe streetwear — curated for how Barbados moves.</p>
+    <div class="fr-btns">
+      <a class="fr-btn fr-btn-red" href="/shop">Explore the edit</a>
+      <a class="fr-btn fr-btn-ghost" href="__PAGE:visit-us__">Visit the store</a>
+    </div>
+  </div>
+</section>
+<section class="fr-marquee" data-name="Friction ticker" aria-label="New Arrivals, Graphic Tees, Denim, Statement Sets, Footwear">
+  <div class="fr-marquee-track" aria-hidden="true">
+    <span>New Arrivals</span><i>◆</i><span>Graphic Tees</span><i>◆</i><span>Denim</span><i>◆</i><span>Statement Sets</span><i>◆</i><span>Footwear</span><i>◆</i>
+    <span>New Arrivals</span><i>◆</i><span>Graphic Tees</span><i>◆</i><span>Denim</span><i>◆</i><span>Statement Sets</span><i>◆</i><span>Footwear</span><i>◆</i>
+  </div>
+</section>
+<section class="fr-intro fr-wrapx" data-name="Friction intro">
+  <div>
+    <p class="fr-eyebrow fr-red">At Friction, We Have Options.</p>
+    <h2 class="fr-display">One destination.<br/>More ways to show up.</h2>
+  </div>
+  <p class="fr-lead">Friction Clothing Barbados is a men's clothing store at The Dome Mall in Warrens. Find a look you like, add it to your enquiry bag or send it to us on WhatsApp, and the team will confirm sizes, availability and price.</p>
+</section>
+<section class="fr-cats fr-wrapx" data-name="Friction categories">
+  <a class="fr-cat fr-cat-tall" href="__CAT:graphic-tees__">
+    <img src="__PIMG:16__" alt="Red camo graphic tee, black ripped denim, black cap and red sneakers" loading="lazy"/>
+    <div><span>01</span><h3>Graphic Tees</h3><p>Bold colour. Strong presence.</p></div>
+  </a>
+  <a class="fr-cat" href="__CAT:sets__">
+    <img src="__PIMG:11__" alt="Black graphic tee with yellow sweatpants, yellow cap and black sneakers" loading="lazy"/>
+    <div><span>02</span><h3>Statement Sets</h3><p>Head-to-toe looks for every plan.</p></div>
+  </a>
+  <a class="fr-cat fr-cat-red" href="__CAT:new-arrivals__">
+    <b class="fr-arrow" aria-hidden="true">↗</b>
+    <div><span>03</span><h3>Just Landed</h3><p>Browse the latest looks. Confirm colours, sizes and availability with the team.</p></div>
+  </a>
+</section>
+<section class="fr-rail fr-wrapx" data-name="Friction looks">
+  <div class="fr-head">
+    <div>
+      <p class="fr-eyebrow fr-red">Current rotation</p>
+      <h2 class="fr-display">Build the look</h2>
+    </div>
+    <a class="fr-link" href="/shop">Shop all looks →</a>
+  </div>
+  <div class="fr-grid4">
+    __LOOKCARD:01__
+    __LOOKCARD:06__
+    __LOOKCARD:15__
+    __LOOKCARD:09__
+  </div>
+</section>
+<section class="fr-store" data-name="Friction store">
+  <div class="fr-wrapx fr-store-in">
+    <div>
+      <p class="fr-eyebrow">The Dome Mall · Warrens</p>
+      <h2 class="fr-display">See it. Feel it.<br/>Make it yours.</h2>
+    </div>
+    <div>
+      <p>Shop in store, get sizing help from the team, or message ahead to check availability.</p>
+      <div class="fr-btns">
+        <a class="fr-btn fr-btn-light" href="__PAGE:visit-us__">Plan your visit</a>
+        <a class="fr-btn fr-btn-wa" href="https://wa.me/12466221748?text=Hi%20Friction%2C%20I%27m%20on%20your%20website%20and%20would%20like%20some%20help." target="_blank" rel="noopener">WhatsApp the store</a>
+      </div>
+    </div>
+  </div>
+</section>

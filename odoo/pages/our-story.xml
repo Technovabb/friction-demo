@@ -1,0 +1,33 @@
+<section class="fr-pagehero" data-name="Friction story hero">
+  <div class="fr-wrapx fr-split">
+    <div>
+      <p class="fr-eyebrow fr-red">Friction Clothing · Barbados</p>
+      <h1 class="fr-display">Style with options.</h1>
+    </div>
+    <p class="fr-lead-l">Friction presents men's streetwear with confidence, personality and a Barbadian point of view: graphic tees, denim, statement sets and the footwear that finishes the look.</p>
+  </div>
+</section>
+<section class="fr-collage fr-wrapx" data-name="Friction collage">
+  <div class="fr-panel">
+    <img src="__PIMG:09__" alt="Black graphic tee, black ripped denim and pink-and-black sneakers laid flat" loading="lazy"/>
+    <span>Barbados / 246</span>
+  </div>
+  <div class="fr-quote">
+    <p>“At Friction,<br/>we have options.”</p>
+    <small>Friction's own brand line</small>
+  </div>
+  <div class="fr-strip">
+    <a href="__PROD:03__"><img src="__PIMG:03__" alt="Grey graphic tee, blue denim, brown cap and sneakers" loading="lazy"/></a>
+    <a href="__PROD:05__"><img src="__PIMG:05__" alt="Rust graphic tee, light denim and copper-toned sneakers" loading="lazy"/></a>
+    <a href="__PROD:13__"><img src="__PIMG:13__" alt="Yellow graphic tee, blue denim and yellow sneakers" loading="lazy"/></a>
+  </div>
+</section>
+<section class="fr-values fr-wrapx" data-name="Friction values">
+  <article><span>01</span><h3>Fresh rotation</h3><p>New arrivals up front, so the latest looks are easy to find.</p></article>
+  <article><span>02</span><h3>Head-to-toe</h3><p>Tees, denim, sets and footwear styled together, so you see the full look before you visit.</p></article>
+  <article><span>03</span><h3>Local connection</h3><p>Store-first service at The Dome Mall, with WhatsApp for availability and sizing questions.</p></article>
+</section>
+<section class="fr-note fr-wrapx" data-name="Client note">
+  <strong>Client note: remove before launch</strong>
+  <p>Friction's official company history, a founder quote and store photography are still needed. This page uses only Friction's public brand line and the supplied product photos.</p>
+</section>

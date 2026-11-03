@@ -1,0 +1,35 @@
+<section class="fr-visit" data-name="Friction visit">
+  <div class="fr-visit-copy">
+    <p class="fr-eyebrow fr-red">Visit · Call · Message</p>
+    <h1 class="fr-display">Let's find<br/>your next fit.</h1>
+    <p>Check availability, ask about sizing or plan your visit to Friction Clothing at The Dome Mall.</p>
+    <a class="fr-btn fr-btn-wa fr-btn-big" href="https://wa.me/12466221748?text=Hi%20Friction%2C%20I%27m%20on%20your%20website%20and%20would%20like%20some%20help." target="_blank" rel="noopener">Start a WhatsApp chat</a>
+  </div>
+  <div class="fr-visit-card">
+    <div>
+      <span class="fr-k">Location</span>
+      <h2>The Dome Mall</h2>
+      <p>Warrens, Barbados</p>
+      <a href="https://www.google.com/maps/search/?api=1&amp;query=The+Dome+Mall+Warrens+Barbados" target="_blank" rel="noopener">Get directions ↗</a>
+    </div>
+    <div>
+      <span class="fr-k">Hours</span>
+      <p><strong>Monday – Saturday</strong> 10am – 6pm<br/><strong>Sunday</strong> 10am – 3pm</p>
+      <small class="fr-internal">Client note: hours from Friction's public Instagram. Reconfirm before launch.</small>
+    </div>
+    <div>
+      <span class="fr-k">Call</span>
+      <a class="fr-phone" href="tel:+12466221748">(246) 622-1748</a>
+    </div>
+  </div>
+</section>
+<section class="fr-social" data-name="Friction Instagram">
+  <div>
+    <span class="fr-k">@frictionclothingbarbados</span>
+    <h2 class="fr-display">Follow the latest drops.</h2>
+  </div>
+  <div class="fr-btns">
+    <a class="fr-btn fr-btn-light" href="https://www.instagram.com/frictionclothingbarbados/" target="_blank" rel="noopener">Friction Clothing on Instagram ↗</a>
+    <a class="fr-btn fr-btn-ghost" href="https://www.instagram.com/frictionfootwear/" target="_blank" rel="noopener">Friction Footwear ↗</a>
+  </div>
+</section>

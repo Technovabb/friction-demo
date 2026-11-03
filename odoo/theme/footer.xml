@@ -1,0 +1,29 @@
+<section class="s_text_block fr-footsec" data-snippet="s_text_block" data-name="Friction footer">
+  <div class="fr-wrapx">
+    <div class="fr-foot">
+      <div class="fr-foot-brand">
+        <a href="/" class="fr-wordmark" aria-label="Friction Clothing Barbados, home"><span class="fr-wm-a">FRICTION</span><span class="fr-wm-b">CLOTHING</span></a>
+        <p>At Friction, We Have Options.</p>
+      </div>
+      <div>
+        <h3>Explore</h3>
+        <a href="/shop">Shop</a>
+        <a href="__CAT:new-arrivals__">New Arrivals</a>
+        <a href="__PAGE:our-story__">Our Story</a>
+        <a href="__PAGE:visit-us__">Visit Us</a>
+      </div>
+      <div>
+        <h3>Connect</h3>
+        <a href="tel:+12466221748">(246) 622-1748</a>
+        <a href="https://wa.me/12466221748" target="_blank" rel="noopener">WhatsApp</a>
+        <a href="https://www.instagram.com/frictionclothingbarbados/" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://www.instagram.com/frictionfootwear/" target="_blank" rel="noopener">Friction Footwear</a>
+      </div>
+      <div>
+        <h3>Visit</h3>
+        <p>The Dome Mall<br/>Warrens, Barbados</p>
+        <p>Mon – Sat 10am – 6pm<br/>Sun 10am – 3pm</p>
+      </div>
+    </div>
+  </div>
+</section>

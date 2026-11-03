@@ -1,0 +1,8 @@
+<data name="Friction product price">
+  <xpath expr="//div[@name='product_price_container']" position="before">
+    <div class="fr-por">Price on request</div>
+  </xpath>
+  <xpath expr="//div[@name='product_price']" position="after">
+    <p class="fr-avail"><span class="fr-dot" aria-hidden="true"></span>Availability to be confirmed</p>
+  </xpath>
+</data>
