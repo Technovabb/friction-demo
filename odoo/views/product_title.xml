@@ -1,5 +1,5 @@
 <data name="Friction product title">
   <xpath expr="//h1[@t-field='product.name']" position="before">
-    <p class="fr-eyebrow fr-ptag"><t t-if="product.website_ribbon_id"><t t-out="product.website_ribbon_id.name"/> · </t><span class="fr-red">Details to confirm</span></p>
+    <p class="fr-eyebrow fr-ptag"><span class="fr-look-tag">Styled Look</span><t t-if="product.website_ribbon_id"> · <t t-out="product.website_ribbon_id.name"/></t></p>
   </xpath>
 </data>

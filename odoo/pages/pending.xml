@@ -1,0 +1,13 @@
+<section class="fr-pagehero fr-pagehero-sm" data-name="Page title">
+  <div class="fr-wrapx">
+    <p class="fr-eyebrow fr-red">Friction Clothing · Barbados</p>
+    <h1 class="fr-display">__PAGENAME__</h1>
+  </div>
+</section>
+<section class="fr-wrapx fr-pending" data-name="Contact Friction for details">
+  <p>Contact Friction for details.</p>
+  <div class="fr-btns">
+    <a class="fr-btn fr-btn-wa" href="https://wa.me/12466221748" target="_blank" rel="noopener">WhatsApp Friction</a>
+    <a class="fr-btn fr-btn-dark" href="tel:+12466221748">Call (246) 622-1748</a>
+  </div>
+</section>

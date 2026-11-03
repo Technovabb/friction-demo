@@ -1,0 +1,19 @@
+<data name="Friction enquiry call to action">
+  <xpath expr="//div[@id='contact_us_wrapper']" position="replace">
+    <div id="contact_us_wrapper" class="d-flex flex-column w-100 gap-3 fr-cta">
+      <div class="fr-size">
+        <label class="fr-size-label" t-attf-for="fr-size-#{product.id}">Size — availability to confirm</label>
+        <select class="form-select fr-size-select" t-attf-id="fr-size-#{product.id}">
+          <option value="" selected="selected">Select a size</option>
+          <option value="S">S</option>
+          <option value="M">M</option>
+          <option value="L">L</option>
+          <option value="XL">XL</option>
+          <option value="2XL">2XL</option>
+        </select>
+        <p class="fr-size-help">Optional. Choosing a size adds it to your message; it does not mean the size is in stock.</p>
+      </div>
+      <a class="btn btn-primary w-100 fr-check" href="https://wa.me/12466221748" target="_blank" rel="noopener" t-att-data-look="product.name">Check Price &amp; Availability</a>
+    </div>
+  </xpath>
+</data>

@@ -1,0 +1,27 @@
+<section class="fr-pagehero fr-pagehero-sm" data-name="Contact title">
+  <div class="fr-wrapx">
+    <p class="fr-eyebrow fr-red">Call · WhatsApp · Visit</p>
+    <h1 class="fr-display">Contact</h1>
+  </div>
+</section>
+<section class="fr-wrapx fr-pending fr-contact" data-name="Contact details">
+  <div>
+    <span class="fr-k">Call or WhatsApp</span>
+    <p><a href="tel:+12466221748">(246) 622-1748</a></p>
+    <p><a href="https://wa.me/12466221748" target="_blank" rel="noopener">Start a WhatsApp chat</a></p>
+  </div>
+  <div>
+    <span class="fr-k">Store</span>
+    <p>The Dome Mall<br/>Warrens, Barbados</p>
+    <p><a href="https://www.google.com/maps/search/?api=1&amp;query=The+Dome+Mall+Warrens+Barbados" target="_blank" rel="noopener">Get directions</a></p>
+  </div>
+  <div>
+    <span class="fr-k">Hours</span>
+    <p>Monday – Saturday 10am – 6pm<br/>Sunday 10am – 3pm</p>
+  </div>
+  <div>
+    <span class="fr-k">Instagram</span>
+    <p><a href="https://www.instagram.com/frictionclothingbarbados/" target="_blank" rel="noopener">@frictionclothingbarbados</a></p>
+    <p><a href="https://www.instagram.com/frictionfootwear/" target="_blank" rel="noopener">@frictionfootwear</a></p>
+  </div>
+</section>

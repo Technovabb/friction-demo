@@ -41,6 +41,8 @@
     // A step's main_button_label is the text of the button that leads TO that step.
     // The last button (on /shop/payment) reads the company's free_order_label, because every cart is $0.
     freeOrderLabel: 'Send enquiry',
+    shopTitle: 'Men’s Streetwear in Barbados | Friction Clothing',
+    shopDesc: 'Shop men’s streetwear, graphic tees, denim, statement sets and footwear from Friction Clothing at The Dome Mall in Warrens, Barbados.',
     emailSubject: "Your Friction enquiry {{ object.name or '' }}",
     steps: {
       '/shop/cart': { name: 'Enquiry bag', main_button_label: 'Continue' },
@@ -205,12 +207,15 @@
     if (classes) {
       classes = classes.replace(/\bo_wsale_products_opt_thumb_cover\b/, 'o_wsale_products_opt_thumb_contain');
       if (!/o_wsale_products_opt_thumb_contain/.test(classes)) classes += ' o_wsale_products_opt_thumb_contain';
+      // enquiry-only: no wishlist or compare controls on the cards
+      classes = classes.replace(/\bo_wsale_products_opt_(has_wishlist|wishlist_fixed|wishlist_inline|has_comparison)\b/g, '').replace(/\s+/g, ' ');
     }
     const share = await fetchB64('images/share-1200x630.jpg');
     const vals = pick('website', {
       name: BIZ.site, tz: 'America/Barbados', configurator_done: true, cookies_bar: false,
       shop_ppg: 20, shop_ppr: 4, shop_default_sort: 'website_sequence asc', account_on_checkout: 'optional',
-      ecommerce_access: 'everyone', prevent_sale: false, contact_us_link_url: '/visit-us',
+      // Enquiry-only: Odoo's "Hide Add To Cart" for $0 products also stops anything reaching the cart or checkout
+      ecommerce_access: 'everyone', prevent_sale: true, prevent_sale_for: 'zero_price', contact_us_link_url: '/visit-us',
       product_page_image_ratio: 'auto', product_page_image_ratio_mobile: 'auto', product_page_image_width: '50_pc',
       social_default_image: share, robots_txt: 'User-agent: *\nDisallow: /',
     }, out.skipped);
@@ -308,14 +313,15 @@
 
   FRB.products = async (offset = 0, limit = 8) => {
     need();
-    if (!FRB.cfg.cat || !FRB.cfg.ribbon || !FRB.cfg.sizeAttr) throw new Error('Run categories, ribbons and sizeAttr first.');
+    if (!FRB.cfg.cat || !FRB.cfg.ribbon) throw new Error('Run categories and ribbons first.');
+    const sizeAttr = await xid('attr_size', 'product.attribute');
     const C = await catalogue(), T = 'product.template', out = { created: [], updated: [], errors: [] };
     FRB.cfg.prod = FRB.cfg.prod || {};
     const list = C.looks.slice(offset, offset + limit);
     for (const L of list) {
       try {
         const img = await fetchB64(`images/look-${L.n}.jpg`);
-        const descHtml = `<p>${esc(L.desc)}</p><p><em>Working catalogue name. Brand, pieces included, materials and sizes to be confirmed by Friction.</em></p>`;
+        const descHtml = `<p>${esc(L.desc)}</p>`;
         const base = {
           name: L.name, sale_ok: true, purchase_ok: false, type: 'consu', is_storable: false, list_price: 0,
           description_sale: L.note, description_ecommerce: descHtml,
@@ -330,9 +336,11 @@
         let id = await xid(name, T);
         if (id) { await rpc(T, 'write', [[id], vals]); out.updated.push(L.n); }
         else { id = idOf(await rpc(T, 'create', [vals])); await setXid(name, T, id); out.created.push(L.n); }
-        // size pills (no_variant: no variants, no stock implied)
-        const lines = await rpc('product.template.attribute.line', 'search_read', [[['product_tmpl_id', '=', id], ['attribute_id', '=', FRB.cfg.sizeAttr]]], { fields: ['id'] });
-        if (!lines.length) await rpc(T, 'write', [[id], { attribute_line_ids: [[0, 0, { attribute_id: FRB.cfg.sizeAttr, value_ids: [[6, 0, FRB.cfg.sizeVals]] }]] }]);
+        // No size attribute on the product: Odoo would preselect a size. The optional size enquiry lives in views/cta_enquiry.xml.
+        if (sizeAttr) {
+          const lines = await rpc('product.template.attribute.line', 'search', [[['product_tmpl_id', '=', id], ['attribute_id', '=', sizeAttr]]]);
+          if (lines.length) await rpc(T, 'write', [[id], { attribute_line_ids: lines.map((l) => [2, l]) }]);
+        }
         FRB.cfg.prod[L.n] = id;
       } catch (e) { out.errors.push(L.n + ': ' + short(e)); }
     }
@@ -407,6 +415,12 @@
       [[], ['website_sale.product_attributes_body']],
       [['website_sale.products_categories_top'], []],
       [[], ['website.header_call_to_action']],
+      // enquiry-only: no wishlist, compare, quantity or sign-in until accounts and checkout are wanted
+      [[], ['website_sale.add_to_wishlist', 'website_sale.product_add_to_wishlist', 'website_sale.header_wishlist_link']],
+      [[], ['website_sale.add_to_compare', 'website_sale.product_add_to_compare']],
+      [[], ['website_sale.product_quantity']],
+      [[], ['portal.user_sign_in']],
+      [[], ['website.brand_promotion']],
     ];
     for (const [en, dis] of tries) {
       try { await themeOption(en, dis); out[(en.concat(dis)).join(',')] = 'ok'; } catch (e) { out[(en.concat(dis)).join(',')] = 'skipped: ' + short(e); }
@@ -465,7 +479,7 @@
           return `<a class="fr-card" href="${esc(purl[pid] || '/shop/' + pid)}"><div class="fr-card-media">`
             + `<img src="/web/image/product.template/${pid}/image_1024" alt="${esc(L.name + ': ' + L.visible.replace(/;/g, ','))}" loading="lazy"/>`
             + (ribbon ? `<span class="fr-badge fr-badge-${L.badge}">${esc(ribbon.name)}</span>` : '')
-            + `</div><div class="fr-card-meta"><h3>${esc(L.name)}</h3><p>${esc(L.note)}</p><p class="fr-por-s">Price on request</p></div></a>`;
+            + `</div><div class="fr-card-meta"><span class="fr-look-tag">Styled Look</span><h3>${esc(L.name)}</h3><p>${esc(L.note)}</p><p class="fr-por-s">Price on request</p></div></a>`;
         }
         default: return null;
       }
@@ -503,7 +517,7 @@
       out.conflicts.push(`${c.name} moved from ${p.url} to ${p.url}-odoo-default (unpublished)`);
     }
     let page = (await rpc('website.page', 'search_read', [[['view_id', '=', view.id]]], { fields: ['id'] }))[0];
-    const pvals = pick('website.page', { url: p.url, is_published: true, name: p.name, website_id: wid(),
+    const pvals = pick('website.page', { url: p.url, is_published: p.published !== false, name: p.name, website_id: wid(),
       website_meta_title: p.seo && p.seo.title, website_meta_description: p.seo && p.seo.description });
     if (page) await rpc('website.page', 'write', [[page.id], pvals], { context: wctx() });
     else page = { id: idOf(await rpc('website.page', 'create', [Object.assign({ view_id: view.id }, pvals)], { context: wctx() })) };
@@ -516,7 +530,7 @@
     for (const p of pages) {
       if (!p.file || (only && only !== p.key)) continue;
       try {
-        const { s, missing } = await fill(await fetchText('pages/' + p.file));
+        const { s, missing } = await fill((await fetchText('pages/' + p.file)).split('__PAGENAME__').join(esc(p.name)));
         if (missing.length) out.missingTokens.push(p.key + ': ' + missing.join(' '));
         checkXml(s, p.file);
         out.done.push(p.url === '/' ? await writeHomepage(s, p.seo) : await upsertPage(p, s, out));
@@ -533,21 +547,55 @@
     if (!top) throw new Error('No main menu for this website');
     const kids = await rpc(WM, 'search_read', [[['parent_id', '=', top]]], { fields: ['id', 'name', 'url'] });
     const norm = (u) => String(u || '').replace(/[?#].*$/, '').replace(/\/+$/, '') || '/';
-    const desired = pages.filter((p) => p.menu).sort((a, b) => a.sequence - b.sequence)
-      .map((p) => ({ name: p.name, url: p.cat ? FRB.cfg.catUrl[p.cat] : p.url, sequence: p.sequence }));
-    const used = new Set(), out = { updated: [], created: [], removed: [] };
+    const urlOf = (p) => (p.cat ? FRB.cfg.catUrl[p.cat] : p.url);
+    const desired = pages.filter((p) => p.menu && !p.parent).sort((a, b) => a.sequence - b.sequence)
+      .map((p) => ({ key: p.key, name: p.name, url: urlOf(p), sequence: p.sequence }));
+    const used = new Set(), idByKey = {}, out = { updated: [], created: [], children: [], removed: [] };
     for (const d of desired) {
       if (!d.url) throw new Error('No URL for menu ' + d.name + ' (run categories first)');
       const hit = kids.find((k) => !used.has(k.id) && norm(k.url) === norm(d.url)) ||
         kids.find((k) => !used.has(k.id) && k.name.trim().toLowerCase() === d.name.toLowerCase());
-      if (hit) { used.add(hit.id); await rpc(WM, 'write', [[hit.id], { name: d.name, url: d.url, sequence: d.sequence }]); out.updated.push(d.name); }
-      else { used.add(idOf(await rpc(WM, 'create', [{ name: d.name, url: d.url, parent_id: top, website_id: wid(), sequence: d.sequence }]))); out.created.push(d.name); }
+      if (hit) { idByKey[d.key] = hit.id; await rpc(WM, 'write', [[hit.id], { name: d.name, url: d.url, sequence: d.sequence }]); out.updated.push(d.name); }
+      else { idByKey[d.key] = idOf(await rpc(WM, 'create', [{ name: d.name, url: d.url, parent_id: top, website_id: wid(), sequence: d.sequence }])); out.created.push(d.name); }
+      used.add(idByKey[d.key]);
+    }
+    // Dropdowns: entries with "parent" become children (Shop > All Looks, New Arrivals ... Footwear)
+    for (const parentKey of [...new Set(pages.filter((p) => p.menu && p.parent).map((p) => p.parent))]) {
+      const pid = idByKey[parentKey];
+      if (!pid) continue;
+      const have = await rpc(WM, 'search_read', [[['parent_id', '=', pid]]], { fields: ['id', 'name'] });
+      const keep = new Set();
+      for (const c of pages.filter((p) => p.menu && p.parent === parentKey).sort((a, b) => a.sequence - b.sequence)) {
+        const vals = { name: c.name, url: urlOf(c), sequence: c.sequence };
+        if (!vals.url) throw new Error('No URL for menu ' + c.name + ' (run categories first)');
+        const hit = have.find((k) => !keep.has(k.id) && k.name.trim().toLowerCase() === c.name.toLowerCase());
+        if (hit) { keep.add(hit.id); await rpc(WM, 'write', [[hit.id], vals]); }
+        else keep.add(idOf(await rpc(WM, 'create', [Object.assign({ parent_id: pid, website_id: wid() }, vals)])));
+        out.children.push(c.name);
+      }
+      const extra = have.filter((k) => !keep.has(k.id));
+      if (extra.length) await rpc(WM, 'unlink', [extra.map((k) => k.id)]);
     }
     // The menu above is the whole navigation for this demo: Home is the wordmark, Visit Us replaces Contact us,
     // and the trial's extra app pages (Appointments etc.) stay reachable by URL only. Menu items are removed, pages are not.
     const remove = kids.filter((k) => !used.has(k.id));
     if (remove.length) await rpc(WM, 'unlink', [remove.map((k) => k.id)]);
     out.removed = remove.map((k) => `${k.name} (${k.url})`);
+    return out;
+  };
+
+  // /shop renders the website_sale.products view, so its title and description live on that view.
+  // Odoo's sample /contactus and /privacy pages carry demo text, so they stay unpublished until Friction approves real ones.
+  FRB.seo = async () => {
+    need();
+    const out = {};
+    const v = await viewFor('website_sale.products');
+    if (!v) throw new Error('website_sale.products view not found');
+    await rpc('ir.ui.view', 'write', [[v.id], { website_meta_title: FRB.text.shopTitle, website_meta_description: FRB.text.shopDesc }], v.website_id ? { context: wctx() } : {});
+    out.shop = 'view ' + v.id;
+    const samples = await rpc('website.page', 'search_read', [[['url', 'in', ['/contactus', '/privacy']], ['website_id', 'in', [wid(), false]], ['is_published', '=', true]]], { fields: ['id', 'url'] });
+    if (samples.length) await rpc('website.page', 'write', [samples.map((s) => s.id), { is_published: false }]);
+    out.unpublishedSamples = samples.map((s) => s.url);
     return out;
   };
 
@@ -606,11 +654,27 @@
     out.published = rows.filter((r) => r.is_published).length;
     out.nonZeroPrices = rows.filter((r) => r.list_price).map((r) => r.name);
     out.skus = rows.filter((r) => r.default_code).map((r) => r.name);
-    const pages = {};
-    for (const u of ['/', '/shop', '/our-story', '/visit-us', ...(Object.values(FRB.cfg.catUrl || {}))]) {
-      try { const r = await fetch(u, { credentials: 'omit' }); pages[u] = r.status; } catch (e) { pages[u] = short(e); }
+    // Public pages as a logged-out visitor sees them: one H1, no internal notes, noindex kept, no sign-in, no cart or checkout
+    const pages = {}, problems = [];
+    const firstProduct = ids.length ? (await rpc(T, 'read', [[ids[0]]], { fields: ['website_url'] }))[0].website_url : null;
+    const internal = /Client note|remove before launch|Private concept|Catalogue note|Client demo|working (catalogue |look )?names?|Details to confirm|demo only|Powered by/i;
+    for (const u of ['/', '/shop', '/our-story', '/visit-us', '/enquiry-bag', ...(Object.values(FRB.cfg.catUrl || {})), firstProduct].filter(Boolean)) {
+      try {
+        const r = await fetch(u, { credentials: 'omit' });
+        const d = new DOMParser().parseFromString(await r.text(), 'text/html');
+        d.querySelectorAll('script,style').forEach((n) => n.remove());
+        const h1 = d.querySelectorAll('h1').length, text = d.body.textContent;
+        pages[u] = r.status + ' h1:' + h1;
+        if (h1 !== 1) problems.push(`${u}: ${h1} H1s`);
+        if (internal.test(text)) problems.push(`${u}: internal text "${text.match(internal)[0]}"`);
+        if (!/noindex/.test((d.querySelector('meta[name="robots"]') || {}).content || '')) problems.push(`${u}: noindex missing`);
+        if (!(d.querySelector('meta[name="description"]') || {}).content) problems.push(`${u}: no meta description`);
+        if (d.querySelector('a[href^="/web/login"]')) problems.push(`${u}: Sign in link`);
+        if (d.querySelector('a[href="/shop/cart"], a[href^="/shop/checkout"], #add_to_cart_wrap:not(.d-none), .o_add_wishlist, .o_add_compare')) problems.push(`${u}: cart, wishlist or compare control`);
+      } catch (e) { pages[u] = short(e); }
     }
     out.publicStatus = pages;
+    out.problems = problems;
     try { const r = await fetch(`/web/image/product.template/${ids[0]}/image_512`, { credentials: 'omit' }); out.imagePublic = r.status + ' ' + r.headers.get('content-type'); } catch (e) { out.imagePublic = short(e); }
     return out;
   };
@@ -622,8 +686,8 @@
     try { const report = await FRB[step](...args); save(); return { step, ok: true, ms: Math.round(performance.now() - t0), report }; }
     catch (e) { save(); return { step, ok: false, ms: Math.round(performance.now() - t0), error: short(e) }; }
   };
-  FRB.ORDER = ['introspect', 'settings', 'theme', 'categories', 'ribbons', 'sizeAttr', 'products', 'delivery', 'checkout', 'email',
-    'options', 'views', 'pages', 'menus', 'customCode', 'placeholders', 'verify'];
+  FRB.ORDER = ['introspect', 'settings', 'theme', 'categories', 'ribbons', 'products', 'delivery', 'checkout', 'email',
+    'options', 'views', 'pages', 'menus', 'seo', 'customCode', 'placeholders', 'verify'];
   FRB.all = async (from) => {
     const res = [];
     for (const step of FRB.ORDER.slice(from ? FRB.ORDER.indexOf(from) : 0)) {
@@ -637,6 +701,6 @@
     }
     return res;
   };
-  FRB.help = () => FRB.ORDER.concat(['removeViews', 'resetEmail', 'theme({reset:true})']);
+  FRB.help = () => FRB.ORDER.concat(['removeViews', 'resetEmail', 'theme({reset:true})', 'sizeAttr (only once real sizes and stock exist)']);
   return 'FRB ' + FRB.VERSION + ' ready. Next: await FRB.run("introspect")';
 })();

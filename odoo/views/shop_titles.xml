@@ -1,0 +1,13 @@
+<data name="Friction shop headings">
+  <xpath expr="//h1[hasclass('o_wsale_category_title')]" position="replace">
+    <h2 t-if="search" class="o_wsale_category_title d-flex flex-wrap gap-2 align-items-center mb-0 base-fs">
+      <span class="text-muted">Searching</span>
+      <strong t-out="search"/>
+      <t t-if="category"><span class="text-muted">in</span> <span t-out="category.name"/></t>
+      <a t-att-href="keep(search=0)" class="small">Clear search</a>
+    </h2>
+  </xpath>
+  <xpath expr="//div[hasclass('o_wsale_shop_title')]/h1" position="replace">
+    <h2 class="h4-fs">All products</h2>
+  </xpath>
+</data>

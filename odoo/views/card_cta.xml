@@ -1,0 +1,7 @@
+<data name="Friction card call to action">
+  <xpath expr="//div[hasclass('o_wsale_product_action_row')]" position="replace">
+    <div class="o_wsale_product_action_row">
+      <a class="o_wsale_product_btn_primary btn btn-primary fr-card-cta" href="https://wa.me/12466221748" target="_blank" rel="noopener" t-att-data-look="product.name" t-attf-aria-label="Check price and availability for #{product.name} on WhatsApp">Check Price &amp; Availability</a>
+    </div>
+  </xpath>
+</data>

@@ -1,0 +1,5 @@
+<data name="Friction styled look tag on cards">
+  <xpath expr="//h6[hasclass('o_wsale_products_item_title')]" position="before">
+    <span class="fr-look-tag">Styled Look</span>
+  </xpath>
+</data>

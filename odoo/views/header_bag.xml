@@ -1,0 +1,11 @@
+<data name="Friction enquiry bag link">
+  <xpath expr="//a[@href='/shop/cart']" position="replace">
+    <a href="/enquiry-bag" t-attf-class="#{_link_class} fr-baglink" aria-label="Enquiry Bag" title="Enquiry Bag">
+      <div t-attf-class="#{_icon_wrap_class}">
+        <svg class="fr-bag-ico" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 8h13l-1 12.5h-11z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>
+        <sup t-attf-class="fr-bag-count badge bg-primary #{_badge_class} d-none">0</sup>
+      </div>
+      <span t-if="_text" t-attf-class="#{_text_class}">Enquiry Bag</span>
+    </a>
+  </xpath>
+</data>

@@ -1,63 +1,108 @@
-<!-- Friction demo: WhatsApp helpers (Tech Nova). Only builds wa.me links; sends nothing by itself. -->
+<!-- Friction: WhatsApp enquiries and the Enquiry Bag (Tech Nova). Builds wa.me links and keeps the bag in this browser only; sends nothing by itself. -->
 <script>
 (function () {
   'use strict';
   var WA = 'https://wa.me/12466221748';
+  var KEY = 'friction_enquiry_bag';
+  var ASK = 'Can you confirm the available items, sizes and price?';
   function waLink(text) { return WA + '?text=' + encodeURIComponent(text); }
   function ready(fn) { if (document.readyState !== 'loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function localPath(u) { return /^\/[^/]/.test(String(u || '')) ? String(u) : '/shop'; }
+  function withSize(look, size) { return look + (size ? ' (size ' + size + ')' : ''); }
+  function load() { try { var v = JSON.parse(localStorage.getItem(KEY) || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; } }
+  function store(items) { try { localStorage.setItem(KEY, JSON.stringify(items)); return true; } catch (e) { return false; } }
+  function updateCount() {
+    var n = load().length;
+    document.querySelectorAll('.fr-bag-count').forEach(function (b) { b.textContent = n; b.classList.toggle('d-none', !n); });
+  }
+
+  function renderBag(host, emptyHtml) {
+    var items = load();
+    if (!items.length) { host.innerHTML = emptyHtml; return; }
+    var lines = items.map(function (it, i) { return (i + 1) + '. ' + withSize(it.name, it.size); });
+    var text = 'Hi Friction, I’m interested in these looks from your website:\n' + lines.join('\n') + '\n' + ASK;
+    host.innerHTML = '<ul class="fr-bag-list">' + items.map(function (it, i) {
+      var url = esc(localPath(it.url)), img = esc(localPath(it.img));
+      return '<li class="fr-bag-item">'
+        + '<a class="fr-bag-img" href="' + url + '"><img src="' + img + '" alt="' + esc(it.name) + '" loading="lazy"/></a>'
+        + '<div class="fr-bag-info"><span class="fr-look-tag">Styled Look</span><a href="' + url + '">' + esc(it.name) + '</a>'
+        + '<p>' + (it.size ? 'Size ' + esc(it.size) + ' (availability to confirm)' : 'Size not chosen') + ' · Price on request</p></div>'
+        + '<button type="button" class="fr-bag-remove" data-i="' + i + '" aria-label="Remove ' + esc(it.name) + ' from your Enquiry Bag">Remove</button>'
+        + '</li>';
+    }).join('') + '</ul>'
+      + '<div class="fr-bag-actions">'
+      + '<a class="fr-btn fr-btn-red" target="_blank" rel="noopener" href="' + esc(waLink(text)) + '">Send my Enquiry Bag on WhatsApp</a>'
+      + '<a class="fr-btn fr-btn-outline" href="/shop">Keep browsing</a>'
+      + '<button type="button" class="fr-bag-clear">Clear bag</button>'
+      + '</div>'
+      + '<p class="fr-bag-note">Your Enquiry Bag is saved in this browser only. Nothing is sent until you tap Send.</p>';
+    host.querySelectorAll('.fr-bag-remove').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var list = load(); list.splice(parseInt(b.getAttribute('data-i'), 10), 1);
+        store(list); updateCount(); renderBag(host, emptyHtml);
+      });
+    });
+    var clear = host.querySelector('.fr-bag-clear');
+    if (clear) clear.addEventListener('click', function () { store([]); updateCount(); renderBag(host, emptyHtml); });
+  }
+
   ready(function () {
     if (document.body.classList.contains('editor_enable')) return;
+    var path = location.pathname.replace(/\/+$/, '') || '/';
 
-    // Floating WhatsApp button on every page
-    if (!document.querySelector('.fr-wa-float')) {
+    // Enquiry-only: Odoo's cart and checkout pages send visitors to the Enquiry Bag
+    if (/^\/shop\/(cart|checkout|address|payment|extra_info|confirm_order)(\/|$)/.test(path)) { location.replace('/enquiry-bag'); return; }
+
+    updateCount();
+    var isProduct = !!document.querySelector('.fr-check');
+
+    // Floating WhatsApp button, except on pages that already have their own WhatsApp buttons
+    if (!isProduct && path !== '/enquiry-bag' && !document.querySelector('.fr-wa-float')) {
       var f = document.createElement('a');
       f.className = 'fr-wa-float';
-      f.href = waLink("Hi Friction, I'm on your website and would like some help.");
+      f.href = waLink('Hi Friction, I’m on your website and would like some help.');
       f.target = '_blank'; f.rel = 'noopener';
       f.setAttribute('aria-label', 'Chat with Friction on WhatsApp');
       document.body.appendChild(f);
+      document.body.classList.add('fr-has-wa');
     }
 
-    // Product page: "Ask about this look" carries the look name and the size button picked (no price or stock claims)
-    document.querySelectorAll('.fr-wa-look').forEach(function (a) {
-      var look = a.getAttribute('data-look') || (document.querySelector('h1') || {}).textContent || 'this look';
-      function size() {
-        var form = a.closest('#product_detail') || document;
-        var picked = form.querySelector('.variant_attribute input:checked, .js_product input[type="radio"]:checked');
-        if (!picked) return '';
-        var label = picked.getAttribute('data-value-name') || (picked.closest('li, label') || picked.parentElement || {}).textContent || '';
-        label = String(label).trim();
-        return label ? ' (size ' + label + ')' : '';
-      }
-      function update() {
-        a.href = waLink("Hi Friction, I'm interested in the " + look.trim() + size() + " from your website. Is it available?");
-      }
-      update();
-      a.addEventListener('mousedown', update);
-      a.addEventListener('touchstart', update, { passive: true });
-      a.addEventListener('keydown', update);
+    // Shop cards: Check Price & Availability opens WhatsApp with the look name
+    document.querySelectorAll('.fr-card-cta').forEach(function (a) {
+      a.href = waLink('Hi Friction, I’m interested in the ' + (a.getAttribute('data-look') || 'look') + ' from your website. ' + ASK);
     });
 
-    // Enquiry bag: offer to send the looks in the bag over WhatsApp as well
-    if (/^\/shop\/cart\/?$/.test(location.pathname)) {
-      var names = [];
-      document.querySelectorAll('#cart_products .o_cart_product h6, #cart_products .o_cart_product a.h6, #cart_products [name="o_wsale_cart_line_name"], .o_cart_product strong').forEach(function (el) {
-        var t = el.textContent.trim(); if (t && names.indexOf(t) < 0) names.push(t);
+    // Product page: the optional size goes into every message; no size is chosen for the shopper
+    if (isProduct) {
+      var sel = document.querySelector('.fr-size-select');
+      if (sel) sel.value = '';
+      var size = function () { return sel && sel.value ? sel.value : ''; };
+      var refresh = function () {
+        document.querySelectorAll('.fr-check').forEach(function (a) {
+          a.href = waLink('Hi Friction, I’m interested in the ' + withSize(a.getAttribute('data-look'), size()) + ' from your website. ' + ASK);
+        });
+        document.querySelectorAll('.fr-wa-look').forEach(function (a) {
+          a.href = waLink('Hi Friction, I have a question about the ' + withSize(a.getAttribute('data-look'), size()) + ' from your website.');
+        });
+      };
+      refresh();
+      if (sel) sel.addEventListener('change', refresh);
+      document.querySelectorAll('.fr-bag-add').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var items = load(), s = size(), id = String(b.getAttribute('data-pid'));
+          var exists = items.some(function (it) { return it.id === id && it.size === s; });
+          if (!exists) items.push({ id: id, name: b.getAttribute('data-look'), url: b.getAttribute('data-url'), img: b.getAttribute('data-img'), size: s });
+          var msg = document.querySelector('.fr-bag-msg');
+          if (!store(items)) { if (msg) msg.textContent = 'This browser could not save your bag. Use Check Price & Availability instead.'; return; }
+          updateCount();
+          if (msg) msg.innerHTML = (exists ? 'Already in your Enquiry Bag. ' : 'Added to your Enquiry Bag' + (s ? ' (size ' + esc(s) + ')' : '') + '. ') + '<a href="/enquiry-bag">View bag</a>';
+        });
       });
-      var host = document.querySelector('#shop_cart');
-      if (names.length && host && !document.querySelector('.fr-bag-wa')) {
-        var box = document.createElement('div');
-        box.className = 'fr-bag-wa';
-        box.innerHTML = '<p>Prefer to chat? Send these looks to the team on WhatsApp.</p>';
-        var b = document.createElement('a');
-        b.className = 'fr-btn fr-btn-wa';
-        b.target = '_blank'; b.rel = 'noopener';
-        b.textContent = 'Send my bag on WhatsApp';
-        b.href = waLink("Hi Friction, I'd like to check availability and sizes for: " + names.join('; ') + '.');
-        box.appendChild(b);
-        host.appendChild(box);
-      }
     }
+
+    var bag = document.getElementById('fr-bag');
+    if (bag) renderBag(bag, bag.innerHTML);
   });
 })();
 </script>

@@ -1,25 +1,28 @@
 <data name="Friction product extras">
   <xpath expr="//div[@id='o_wsale_product_cta_section']" position="after">
     <div class="fr-pextra">
-      <a class="fr-btn fr-btn-wa fr-wa-look" href="https://wa.me/12466221748" target="_blank" rel="noopener" t-att-data-look="product.name">Ask about this look on WhatsApp</a>
+      <div class="fr-pbtns">
+        <a class="fr-btn fr-btn-wa fr-wa-look" href="https://wa.me/12466221748" target="_blank" rel="noopener" t-att-data-look="product.name">Chat on WhatsApp</a>
+        <button type="button" class="fr-btn fr-btn-outline fr-bag-add" t-att-data-pid="product.id" t-att-data-look="product.name" t-att-data-url="product.website_url" t-attf-data-img="/web/image/product.template/#{product.id}/image_256">Add to Enquiry Bag</button>
+      </div>
+      <p class="fr-bag-msg" role="status" aria-live="polite"></p>
       <div class="fr-acc">
         <details>
-          <summary>Product details</summary>
+          <summary>Product Details</summary>
           <div>
-            <p>Product details coming soon. Brand, the pieces included, materials and care will be added from Friction's approved catalogue.</p>
             <p t-if="product.description_sale">Seen in the photo: <t t-out="product.description_sale"/>.</p>
+            <p>This photograph shows a styled look. Contact Friction for details on the individual pieces, brands, materials and care.</p>
           </div>
         </details>
         <details>
           <summary>Sizing</summary>
-          <div><p>Message us for current sizes. The size buttons above are for this demo only: size availability to confirm.</p></div>
+          <div><p>Sizes are confirmed when Friction replies to your enquiry. Choose a size above to include it in your message, or ask about available sizes.</p></div>
         </details>
         <details>
-          <summary>Collection &amp; delivery</summary>
-          <div><p>Final information pending. Friction will confirm collection at The Dome Mall, Warrens, and any delivery options when they reply to your enquiry. No payment is taken online.</p></div>
+          <summary>Collection &amp; Delivery</summary>
+          <div><p>Friction confirms collection and delivery options when they reply to your enquiry. The store is at The Dome Mall, Warrens, Barbados. No payment is taken online.</p></div>
         </details>
       </div>
-      <p class="fr-demo-note">Client demo: working look name. Price, sizes and stock await Friction's approval.</p>
     </div>
   </xpath>
 </data>

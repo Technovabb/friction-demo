@@ -1,0 +1,19 @@
+<section class="fr-pagehero fr-pagehero-sm" data-name="Enquiry Bag title">
+  <div class="fr-wrapx">
+    <p class="fr-eyebrow fr-red">Price on request · Availability to be confirmed</p>
+    <h1 class="fr-display">Enquiry Bag</h1>
+    <p class="fr-lead-l">Save the looks you like, then send them to Friction on WhatsApp. The team will confirm which pieces, sizes and prices are available. No payment is taken online.</p>
+  </div>
+</section>
+<section class="fr-wrapx fr-bagpage" data-name="Enquiry Bag list">
+  <div id="fr-bag" class="fr-bag" aria-live="polite">
+    <div class="fr-bag-empty">
+      <h2>Your Enquiry Bag is empty.</h2>
+      <p>Browse the styled looks and tap Add to Enquiry Bag, or message Friction directly.</p>
+      <div class="fr-btns">
+        <a class="fr-btn fr-btn-red" href="/shop">Browse the looks</a>
+        <a class="fr-btn fr-btn-wa" href="https://wa.me/12466221748" target="_blank" rel="noopener">WhatsApp Friction</a>
+      </div>
+    </div>
+  </div>
+</section>

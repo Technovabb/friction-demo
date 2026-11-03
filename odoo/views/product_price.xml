@@ -4,5 +4,6 @@
   </xpath>
   <xpath expr="//div[@name='product_price']" position="after">
     <p class="fr-avail"><span class="fr-dot" aria-hidden="true"></span>Availability to be confirmed</p>
+    <p class="fr-disclaimer">This photograph shows a styled look. Items may be sold separately. Message Friction to confirm which pieces, sizes and prices are currently available.</p>
   </xpath>
 </data>

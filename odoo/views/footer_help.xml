@@ -1,0 +1,15 @@
+<data name="Friction customer care links">
+  <xpath expr="//div[@id='footer']" position="after">
+    <t t-set="fr_help" t-value="[('/delivery-collection', 'Delivery &amp; Collection'), ('/returns-refunds', 'Returns &amp; Refunds'), ('/privacy-policy', 'Privacy Policy'), ('/terms-and-conditions', 'Terms &amp; Conditions'), ('/contact', 'Contact')]"/>
+    <t t-set="fr_live" t-value="request.env['website.page'].sudo().search([('url', 'in', ['/delivery-collection', '/returns-refunds', '/privacy-policy', '/terms-and-conditions', '/contact']), ('website_id', 'in', [website.id, False]), ('is_published', '=', True)]).mapped('url')"/>
+    <t t-set="fr_editor" t-value="not website.is_public_user()"/>
+    <div t-if="fr_live or fr_editor" class="fr-help o_not_editable">
+      <div class="fr-wrapx">
+        <span class="fr-help-k">Customer care</span>
+        <t t-foreach="fr_help" t-as="h">
+          <a t-if="h[0] in fr_live or fr_editor" t-att-href="h[0]"><t t-out="h[1]"/><small t-if="h[0] not in fr_live" class="fr-draft"> (unpublished)</small></a>
+        </t>
+      </div>
+    </div>
+  </xpath>
+</data>

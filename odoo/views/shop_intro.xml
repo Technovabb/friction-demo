@@ -2,15 +2,10 @@
   <xpath expr="//div[@id='oe_structure_website_sale_products_1']" position="before">
     <section class="fr-shophero">
       <div class="fr-wrapx">
-        <p class="fr-eyebrow fr-red">Friction collections</p>
-        <h1 class="fr-display"><t t-if="category" t-out="category.name"/><t t-elif="search">Results for “<t t-out="search"/>”</t><t t-else="">Shop the edit</t></h1>
-        <p>Real Friction product photography with working look names. Add a look to your enquiry bag or ask on WhatsApp: the team confirms sizes, availability and price.</p>
+        <p class="fr-eyebrow fr-red">Friction Clothing · The Dome Mall</p>
+        <h1 class="fr-display"><t t-if="category" t-out="category.name"/><t t-elif="search">Results for “<t t-out="search"/>”</t><t t-else="">Shop the Edit</t></h1>
+        <p>Styled looks from Friction Clothing. Tap Check Price &amp; Availability to ask the team on WhatsApp, or save looks to your Enquiry Bag and send them together.</p>
       </div>
     </section>
-  </xpath>
-  <xpath expr="//div[@id='oe_structure_website_sale_products_2']" position="before">
-    <div class="fr-wrapx">
-      <div class="fr-catnote"><span aria-hidden="true">i</span><p><strong>Catalogue note.</strong> Product photography is supplied by Friction. Look names are working titles based on what each photo shows; exact items, prices, sizes and stock are still to be confirmed.</p></div>
-    </div>
   </xpath>
 </data>
