@@ -1,0 +1,5 @@
+<data name="Friction enquiry bag title">
+  <xpath expr="//div[@id='shop_cart']//h4[contains(., 'Order summary')]" position="replace">
+    <h4 class="mb-0">Your enquiry bag</h4>
+  </xpath>
+</data>

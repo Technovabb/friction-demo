@@ -27,7 +27,7 @@
         if (!picked) return '';
         var label = picked.getAttribute('data-value-name') || (picked.closest('li, label') || picked.parentElement || {}).textContent || '';
         label = String(label).trim();
-        return label ? ' in size ' + label : '';
+        return label ? ' (size ' + label + ')' : '';
       }
       function update() {
         a.href = waLink("Hi Friction, I'm interested in the " + look.trim() + size() + " from your website. Is it available?");

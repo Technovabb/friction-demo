@@ -1,10 +1,12 @@
 [
-  { "key": "friction_header_brand", "name": "Friction: text wordmark until the official logo arrives", "inherit": "website.option_header_brand_logo", "file": "header_brand.xml" },
-  { "key": "friction_card_price", "name": "Friction: Price on request on shop cards", "inherit": "website_sale.products_item", "file": "card_price.xml" },
-  { "key": "friction_shop_intro", "name": "Friction: shop intro and catalogue note", "inherit": "website_sale.products", "file": "shop_intro.xml" },
-  { "key": "friction_product_title", "name": "Friction: Details to confirm label", "inherit": "website_sale.product_title", "file": "product_title.xml" },
-  { "key": "friction_product_price", "name": "Friction: Price on request and availability on product page", "inherit": "website_sale.product_price", "file": "product_price.xml" },
-  { "key": "friction_add_button", "name": "Friction: Add to enquiry bag button", "inherit": "website_sale.cta_wrapper", "file": "add_button.xml" },
-  { "key": "friction_product_extras", "name": "Friction: WhatsApp button and info accordions", "inherit": "website_sale.product", "file": "product_extras.xml" },
-  { "key": "friction_confirmation", "name": "Friction: enquiry received wording", "inherit": "website_sale.confirmation", "file": "confirmation.xml" }
+  { "key":"friction_header_brand", "name":"Friction: text wordmark until the official logo arrives", "inherit":"website.option_header_brand_logo", "file":"header_brand.xml" },
+  { "key":"friction_card_price", "name":"Friction: Price on request on shop cards", "inherit":"website_sale.products_item", "file":"card_price.xml" },
+  { "key":"friction_shop_intro", "name":"Friction: shop intro and catalogue note", "inherit":"website_sale.products", "file":"shop_intro.xml" },
+  { "key":"friction_product_title", "name":"Friction: Details to confirm label", "inherit":"website_sale.product_title", "file":"product_title.xml" },
+  { "key":"friction_product_price", "name":"Friction: Price on request and availability on product page", "inherit":"website_sale.product_price", "file":"product_price.xml" },
+  { "key":"friction_add_button", "name":"Friction: Add to enquiry bag button", "inherit":"website_sale.cta_wrapper", "file":"add_button.xml" },
+  { "key":"friction_product_extras", "name":"Friction: WhatsApp button and info accordions", "inherit":"website_sale.product", "file":"product_extras.xml" },
+  { "key":"friction_confirmation", "name":"Friction: enquiry received wording", "inherit":"website_sale.confirmation", "file":"confirmation.xml" },
+  { "key":"friction_cart_title", "name":"Friction: Your enquiry bag title", "inherit":"website_sale.cart", "file":"cart_title.xml" },
+  { "key":"friction_submit_label", "name":"Friction: Send enquiry button on the last step", "inherit":"website_sale.navigation_buttons", "file":"submit_label.xml" }
 ]

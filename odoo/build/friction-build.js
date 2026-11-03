@@ -38,11 +38,13 @@
   FRB.text = Object.assign({
     carrierName: 'Collection or delivery: to be confirmed',
     carrierDesc: 'Friction will contact you to confirm availability, sizes and price, and how you would like to collect. No payment is taken online.',
+    // A step's main_button_label is the text of the button that leads TO that step.
+    // The last button (on /shop/payment) is "Send enquiry", set by views/submit_label.xml.
     steps: {
       '/shop/cart': { name: 'Enquiry bag', main_button_label: 'Continue' },
-      '/shop/address': { name: 'Your details' },
+      '/shop/address': { name: 'Your details', main_button_label: false },
       '/shop/checkout': { name: 'Your details', main_button_label: 'Continue' },
-      '/shop/payment': { name: 'Send enquiry', main_button_label: 'Send enquiry' },
+      '/shop/payment': { name: 'Send enquiry', main_button_label: 'Continue' },
     },
   }, prev.text || {});
 
@@ -543,6 +545,26 @@
     return out;
   };
 
+  // Odoo's header and snippets ship a placeholder phone (+1 555-555-5556). Swap in Friction's real number.
+  FRB.placeholders = async () => {
+    need();
+    const rx = [[/tel:\+1 555-555-5556/g, 'tel:+12466221748'], [/\+1 555-555-5556/g, BIZ.phone]];
+    const dom = [['type', '=', 'qweb'], ['website_id', 'in', [wid(), false]], ['key', 'not like', 'website.friction_'], ['arch_db', 'ilike', '555-555-5556']];
+    // website templates only; skip a generic view when this website already has its own copy (the copy is what renders)
+    const views = (await rpc('ir.ui.view', 'search_read', [dom], { fields: ['id', 'key', 'website_id', 'arch_db'] })).filter((v) => /^website/.test(v.key || ''));
+    const generic = [...new Set(views.filter((v) => !v.website_id).map((v) => v.key))];
+    const specific = new Set(generic.length ? (await rpc('ir.ui.view', 'search_read', [[['key', 'in', generic], ['website_id', '=', wid()]]], { fields: ['key'], context: { active_test: false } })).map((v) => v.key) : []);
+    const out = { changed: [], errors: [] };
+    for (const v of views) {
+      if (!v.website_id && specific.has(v.key)) continue;
+      let a = v.arch_db;
+      for (const [r, s] of rx) a = a.replace(r, s);
+      if (a === v.arch_db) continue;
+      try { await rpc('ir.ui.view', 'write', [[v.id], { arch_db: a }], { context: wctx() }); out.changed.push(v.key); } catch (e) { out.errors.push(v.key + ': ' + short(e)); }
+    }
+    return out;
+  };
+
   // ------------------------------------------------------------------ verify (read-only)
   FRB.verify = async () => {
     need();
@@ -570,7 +592,7 @@
     catch (e) { save(); return { step, ok: false, ms: Math.round(performance.now() - t0), error: short(e) }; }
   };
   FRB.ORDER = ['introspect', 'settings', 'theme', 'categories', 'ribbons', 'sizeAttr', 'products', 'delivery', 'checkout',
-    'options', 'views', 'pages', 'menus', 'customCode', 'verify'];
+    'options', 'views', 'pages', 'menus', 'customCode', 'placeholders', 'verify'];
   FRB.all = async (from) => {
     const res = [];
     for (const step of FRB.ORDER.slice(from ? FRB.ORDER.indexOf(from) : 0)) {

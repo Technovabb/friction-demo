@@ -25,7 +25,8 @@
    | `pages` | Home, Our Story (`/our-story`), Visit Us (`/visit-us`), with page titles and descriptions. |
    | `menus` | Shop, New Arrivals, Graphic Tees, Sets, Our Story, Visit Us. |
    | `customCode` | Brand CSS, the concept-demo bar, WhatsApp helpers and the footer. |
-   | `verify` | Read-only checks: 16 published looks, no prices, no SKUs, pages and photos load. |
+   | `placeholders` | Swaps Odoo's placeholder phone number in the header for (246) 622-1748. |
+| `verify` | Read-only checks: 16 published looks, no prices, no SKUs, pages and photos load. |
 
 Every step can be run again safely. Records are tagged `friction_demo.*` (external ids) and views `website.friction_*`.
 

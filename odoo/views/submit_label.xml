@@ -1,0 +1,5 @@
+<data name="Friction send enquiry button">
+  <xpath expr="//form[@name='o_wsale_confirm_order']//t[@t-call='payment.submit_button']" position="replace">
+    <t t-if="not hide_payment_button" t-call="payment.submit_button"><t t-set="submit_button_label">Send enquiry</t></t>
+  </xpath>
+</data>
