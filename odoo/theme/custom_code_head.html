@@ -178,7 +178,7 @@ div[name="product_price_container"],div[name="product_price"] .oe_price,div[name
 
 /* ---------- enquiry bag + checkout: hide money, keep the flow ---------- */
 #wrapwrap :is(span,strong,small,b,del,bdi,div):has(> .oe_currency_value){display:none!important}
-tr[name="o_order_delivery"],tr[name="o_order_total_untaxed"],#order_tax_lines_container,tr[name="o_order_total"],tr[name="o_order_total_taxes"],.coupon_form,#shop_cart div:has(> span > #quick_reorder_button),#shop_cart div:has(> #quick_reorder_button){display:none!important}
+.o_wsale_delivery_price_badge,tr[name="o_order_delivery"],tr[name="o_order_total_untaxed"],#order_tax_lines_container,tr[name="o_order_total"],tr[name="o_order_total_taxes"],.coupon_form,#shop_cart div:has(> span > #quick_reorder_button),#shop_cart div:has(> #quick_reorder_button){display:none!important}
 .o_total_card .card-body::before{content:"Prices, sizes and availability are confirmed by Friction after you send your enquiry. No payment is taken online.";display:block;font-size:13.5px;line-height:1.55;color:#4a4641;margin-bottom:14px}
 .fr-bag-wa{margin-top:28px;padding-top:22px;border-top:1px solid var(--fr-line)}
 .fr-bag-wa p{margin:0 0 12px;color:#4a4641}

@@ -1,0 +1,27 @@
+<div style="margin: 0px; padding: 0px; font-size: 14px; line-height: 20px;">
+    <p style="margin: 0 0 12px;">
+        Hello <t t-out="object.partner_id.name or ''">Customer</t>,
+    </p>
+    <p style="margin: 0 0 12px;">
+        Thank you. Your enquiry <strong t-out="object.name or ''">S00001</strong> is in.
+        Friction will contact you to confirm availability, sizes and price. No payment has been taken.
+    </p>
+    <p style="margin: 16px 0 8px; font-weight: bold;">You asked about</p>
+    <t t-foreach="object.order_line" t-as="line">
+        <table t-if="not line.display_type and not (hasattr(line, 'is_delivery') and line.is_delivery)" width="100%" style="max-width: 590px; font-size: 14px; border-collapse: collapse;" role="presentation">
+            <tr>
+                <td width="76" style="padding: 0 12px 12px 0; vertical-align: top;">
+                    <img t-if="line.product_id" t-attf-src="/web/image/product.product/{{ line.product_id.id }}/image_128" style="width: 64px; height: 64px; object-fit: contain; background-color: #F4F1EB;" alt="Look photo"/>
+                </td>
+                <td style="padding-bottom: 12px; vertical-align: top;">
+                    <strong t-out="line.product_id.name or line.name">G West World Tour Look</strong><br/>
+                    <span t-if="line.product_no_variant_attribute_value_ids" style="opacity: 0.7;">Size <t t-out="', '.join(line.product_no_variant_attribute_value_ids.mapped('name'))">S</t> (availability to confirm)<br/></span>
+                    <span style="opacity: 0.7;">Quantity <t t-out="int(line.product_uom_qty)">1</t> · Price on request</span>
+                </td>
+            </tr>
+        </table>
+    </t>
+    <p style="margin: 16px 0 0;">
+        Questions? Call or WhatsApp Friction on (246) 622-1748, or visit the store at The Dome Mall, Warrens.
+    </p>
+</div>

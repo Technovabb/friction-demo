@@ -39,14 +39,16 @@
     carrierName: 'Collection or delivery: to be confirmed',
     carrierDesc: 'Friction will contact you to confirm availability, sizes and price, and how you would like to collect. No payment is taken online.',
     // A step's main_button_label is the text of the button that leads TO that step.
-    // The last button (on /shop/payment) is "Send enquiry", set by views/submit_label.xml.
+    // The last button (on /shop/payment) reads the company's free_order_label, because every cart is $0.
+    freeOrderLabel: 'Send enquiry',
+    emailSubject: "Your Friction enquiry {{ object.name or '' }}",
     steps: {
       '/shop/cart': { name: 'Enquiry bag', main_button_label: 'Continue' },
       '/shop/address': { name: 'Your details', main_button_label: false },
       '/shop/checkout': { name: 'Your details', main_button_label: 'Continue' },
       '/shop/payment': { name: 'Send enquiry', main_button_label: 'Continue' },
     },
-  }, prev.text || {});
+  }, W.FRB_TEXT || {}); // wording overrides only from window.FRB_TEXT, so reloading the kit always picks up new defaults
 
   // ------------------------------------------------------------------ helpers
   const idOf = (v) => (Array.isArray(v) ? v[0] : v) || false;
@@ -156,7 +158,8 @@
 
   // ------------------------------------------------------------------ introspect
   const MODELS = ['product.template', 'product.public.category', 'product.ribbon', 'product.attribute', 'website',
-    'website.page', 'website.menu', 'website.checkout.step', 'delivery.carrier', 'payment.provider', 'res.groups'];
+    'website.page', 'website.menu', 'website.checkout.step', 'delivery.carrier', 'payment.provider', 'res.groups',
+    'res.company', 'mail.template'];
   FRB.introspect = async () => {
     const cfg = FRB.cfg;
     const vi = await post('/web/webclient/version_info', {});
@@ -365,7 +368,35 @@
       const errs = await writeSafe('website.checkout.step', [r.id], pick('website.checkout.step', v), wctx());
       out.steps.push(r.step_href + (errs.length ? ' errors: ' + errs.join('; ') : ' ok'));
     }
+    // Free carts get a plain submit button labelled with the company's free_order_label ("Confirm Order" by default)
+    const co = idOf((await rpc('website', 'read', [[wid()]], { fields: ['company_id'] }))[0].company_id);
+    if (co && has('res.company', 'free_order_label')) {
+      const errs = await writeSafe('res.company', [co], { free_order_label: FRB.text.freeOrderLabel });
+      out.button = errs.length ? errs : FRB.text.freeOrderLabel;
+    } else out.button = 'skipped: res.company.free_order_label missing';
     return out;
+  };
+
+  // Odoo's "Sales: Order Confirmation" email, reworded as an enquiry receipt with no amounts.
+  // Odoo's own Reset Template (or FRB.run('resetEmail')) puts the original back.
+  async function confirmationTemplate() {
+    const r = await rpc('ir.model.data', 'search_read', [[['module', '=', 'sale'], ['name', '=', 'mail_template_sale_confirmation']]], { fields: ['res_id'] });
+    if (!r.length) throw new Error('sale.mail_template_sale_confirmation not found');
+    return r[0].res_id;
+  }
+  FRB.email = async () => {
+    need();
+    const id = await confirmationTemplate();
+    const body = (await fetchText('email/enquiry-confirmation.html')).trim();
+    checkXml(body, 'email/enquiry-confirmation.html');
+    const errs = await writeSafe('mail.template', [id], pick('mail.template', { subject: FRB.text.emailSubject, body_html: body }));
+    return { template: id, result: errs.length ? errs : 'ok' };
+  };
+  FRB.resetEmail = async () => {
+    need();
+    const id = await confirmationTemplate();
+    await rpc('mail.template', 'reset_template', [[id]]);
+    return { template: id, result: 'reset to Odoo default' };
   };
 
   FRB.options = async () => {
@@ -591,7 +622,7 @@
     try { const report = await FRB[step](...args); save(); return { step, ok: true, ms: Math.round(performance.now() - t0), report }; }
     catch (e) { save(); return { step, ok: false, ms: Math.round(performance.now() - t0), error: short(e) }; }
   };
-  FRB.ORDER = ['introspect', 'settings', 'theme', 'categories', 'ribbons', 'sizeAttr', 'products', 'delivery', 'checkout',
+  FRB.ORDER = ['introspect', 'settings', 'theme', 'categories', 'ribbons', 'sizeAttr', 'products', 'delivery', 'checkout', 'email',
     'options', 'views', 'pages', 'menus', 'customCode', 'placeholders', 'verify'];
   FRB.all = async (from) => {
     const res = [];
@@ -606,6 +637,6 @@
     }
     return res;
   };
-  FRB.help = () => FRB.ORDER.concat(['removeViews', 'theme({reset:true})']);
+  FRB.help = () => FRB.ORDER.concat(['removeViews', 'resetEmail', 'theme({reset:true})']);
   return 'FRB ' + FRB.VERSION + ' ready. Next: await FRB.run("introspect")';
 })();

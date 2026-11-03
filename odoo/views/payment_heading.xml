@@ -1,0 +1,5 @@
+<data name="Friction review and send heading">
+  <xpath expr="//h4[contains(., 'Confirm order')]" position="replace">
+    <h4 t-else="" class="mb-3">Review and send</h4>
+  </xpath>
+</data>
