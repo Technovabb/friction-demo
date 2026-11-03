@@ -23,6 +23,14 @@ header#top .o_searchbar_form .btn,header#top .oe_search_button{background:#15151
 header#top .my_cart_quantity,header#top .o_wsale_cart_quantity{background:var(--fr-red)!important;color:#fff!important}
 header#top .navbar-toggler,header#top .o_mobile_menu_toggle{color:#fff!important;border-color:#444}
 header#top .navbar-toggler-icon{filter:invert(1) brightness(2)}
+#top_menu_collapse_mobile,.o_navbar_mobile{background-color:var(--fr-ink)!important;color:#fff}
+#top_menu_collapse_mobile .btn-close{filter:invert(1) grayscale(1) brightness(2);opacity:1}
+#top_menu_collapse_mobile .top_menu .nav-item{border-color:#222!important}
+#top_menu_collapse_mobile .top_menu .nav-link{font:400 34px/1.05 var(--fr-display)!important;text-transform:uppercase;letter-spacing:.01em;padding:14px 16px!important;min-height:56px;color:#fff!important}
+#top_menu_collapse_mobile .top_menu .nav-link.active,#top_menu_collapse_mobile .top_menu .nav-link:hover{color:var(--fr-red)!important}
+#top_menu_collapse_mobile a,#top_menu_collapse_mobile .btn:not(.oe_search_button){color:#fff!important}
+#top_menu_collapse_mobile .search-query{background:#1a1a1a!important;color:#fff!important}
+#top_menu_collapse_mobile .oe_search_button{background:#1a1a1a!important;color:#fff!important;border-color:#1a1a1a!important}
 .fr-wordmark{display:inline-flex;flex-direction:column;line-height:.86;text-decoration:none!important;padding:4px 0}
 .fr-wordmark .fr-wm-a{font:400 27px/1 var(--fr-display);letter-spacing:.02em;color:#fff;font-style:italic}
 .fr-wordmark .fr-wm-b{font:700 8.5px/1.4 var(--fr-sans);letter-spacing:.42em;color:var(--fr-red);padding-left:2px}
@@ -169,7 +177,7 @@ div[name="product_price_container"],div[name="product_price"] .oe_price,div[name
 
 /* ---------- enquiry bag + checkout: hide money, keep the flow ---------- */
 #wrapwrap :is(span,strong,small,b,del,bdi,div):has(> .oe_currency_value){display:none!important}
-tr[name="o_order_delivery"],tr[name="o_order_total_untaxed"],#order_tax_lines_container,tr[name="o_order_total"],tr[name="o_order_total_taxes"],.coupon_form,.o_wsale_quick_reorder,[name="o_wsale_quick_reorder"]{display:none!important}
+tr[name="o_order_delivery"],tr[name="o_order_total_untaxed"],#order_tax_lines_container,tr[name="o_order_total"],tr[name="o_order_total_taxes"],.coupon_form,#shop_cart div:has(> span > #quick_reorder_button),#shop_cart div:has(> #quick_reorder_button){display:none!important}
 .o_total_card .card-body::before{content:"Prices, sizes and availability are confirmed by Friction after you send your enquiry. No payment is taken online.";display:block;font-size:13.5px;line-height:1.55;color:#4a4641;margin-bottom:14px}
 .fr-bag-wa{margin-top:28px;padding-top:22px;border-top:1px solid var(--fr-line)}
 .fr-bag-wa p{margin:0 0 12px;color:#4a4641}
@@ -213,7 +221,7 @@ body.editor_enable .fr-wa-float{display:none}
   .fr-wordmark .fr-wm-a{font-size:23px}
   .fr-hero{min-height:calc(100svh - 110px);align-items:flex-end}
   .fr-hero-img{object-position:62% center}
-  .fr-hero-shade{background:linear-gradient(0deg,rgba(8,8,8,.94) 0%,rgba(8,8,8,.7) 48%,rgba(8,8,8,.12) 82%)}
+  .fr-hero>.fr-hero-shade{background:linear-gradient(0deg,rgba(8,8,8,.97) 0%,rgba(8,8,8,.9) 55%,rgba(8,8,8,.25) 88%)}
   .fr-hero-copy{padding:40px 20px 36px}
   .fr-hero h1{font-size:62px}
   .fr-hero-lead{font-size:16px}
