@@ -1,0 +1,20 @@
+<data name="Friction filter panel: close button and categories">
+  <xpath expr="//div[@id='o_wsale_offcanvas_content']" position="before">
+    <div class="fr-oc-head">
+      <span class="fr-oc-title">Filter looks</span>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close filters"/>
+    </div>
+  </xpath>
+  <xpath expr="//div[@id='o_wsale_offcanvas_content']" position="inside">
+    <div t-if="not opt_wsale_categories" class="accordion-item fr-oc-cats">
+      <h2 id="fr_offcanvas_categories_header" class="accordion-header mb-0">
+        <button class="o_wsale_offcanvas_title accordion-button rounded-0" type="button" data-bs-toggle="collapse" data-bs-target="#fr_offcanvas_categories" aria-expanded="true" aria-controls="fr_offcanvas_categories"><b>Categories</b></button>
+      </h2>
+      <div id="fr_offcanvas_categories" class="accordion-collapse collapse show" aria-labelledby="fr_offcanvas_categories_header">
+        <div class="accordion-body pt-0">
+          <t t-call="website_sale.products_categories_list" isOffcanvas="true" _titleClasses.f="d-none" _radioGroup.f="_offcanvas"/>
+        </div>
+      </div>
+    </div>
+  </xpath>
+</data>
