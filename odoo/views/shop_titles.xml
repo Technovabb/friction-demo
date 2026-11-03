@@ -1,5 +1,5 @@
 <data name="Friction shop headings">
-  <xpath expr="//h1[hasclass('o_wsale_category_title')]" position="replace">
+  <xpath expr="//h1[@t-if='category or search']" position="replace">
     <h2 t-if="search" class="o_wsale_category_title d-flex flex-wrap gap-2 align-items-center mb-0 base-fs">
       <span class="text-muted">Searching</span>
       <strong t-out="search"/>
