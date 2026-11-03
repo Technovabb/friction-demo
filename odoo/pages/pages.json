@@ -14,7 +14,7 @@
   { "key": "sets", "name": "Sets", "cat": "sets", "menu": true, "sequence": 40 },
   { "key": "our-story", "name": "Our Story", "url": "/our-story", "file": "our-story.xml", "menu": true, "sequence": 50,
     "seo": { "title": "Our Story | Friction Clothing Barbados",
-             "description": "Friction presents men's streetwear with confidence, personality and a Barbadian point of view. At Friction, We Have Options." } },
+             "description": "Friction Clothing is a men's streetwear store at The Dome Mall in Warrens, Barbados. At Friction, We Have Options." } },
   { "key": "visit-us", "name": "Visit Us", "url": "/visit-us", "file": "visit-us.xml", "menu": true, "sequence": 60,
     "seo": { "title": "Visit Us | Friction Clothing at The Dome Mall, Warrens",
              "description": "Visit Friction Clothing at The Dome Mall, Warrens, Barbados. Call or WhatsApp (246) 622-1748 to check sizes and availability." } },
