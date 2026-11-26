@@ -666,9 +666,11 @@
     const g = c.getContext('2d');
     g.fillStyle = '#E21B2D'; g.fillRect(0, 0, 256, 256);
     g.fillStyle = '#FFFFFF'; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
-    g.font = 'italic 216px FrictionAnton';
-    g.setTransform(1, 0, -0.12, 1, 18, 0); // slant like the wordmark (Anton has no true italic)
-    g.fillText('F', 128, 222);
+    // no "italic" in the font string: Anton has only an upright face, so asking for italic falls back to a serif
+    g.font = '230px FrictionAnton';
+    g.setTransform(1, 0, -0.14, 1, 28, 0); // slant like the wordmark instead
+    g.fillText('F', 128, 227);
+    if (!document.fonts.check('230px FrictionAnton')) throw new Error('Anton did not load; favicon not saved');
     const b64 = c.toDataURL('image/png').split(',')[1];
     const errs = await writeSafe('website', [wid()], { favicon: b64 }, wctx());
     return { favicon: errs.length ? errs : 'ok', bytes: Math.round(b64.length * 0.75) };
