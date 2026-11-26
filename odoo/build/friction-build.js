@@ -653,6 +653,27 @@
     return out;
   };
 
+  // ------------------------------------------------------------------ placeholder browser-tab icon until the logo file arrives
+  // A white italic "F" in the header wordmark's font (Anton) on Friction red, drawn in this tab and saved as the website favicon.
+  FRB.favicon = async () => {
+    need();
+    const css = await (await fetch('https://fonts.googleapis.com/css2?family=Anton&display=block', { credentials: 'omit' })).text();
+    const src = (css.match(/url\((https:[^)]+)\)/) || [])[1];
+    if (!src) throw new Error('Could not find the Anton font file');
+    const face = new FontFace('FrictionAnton', `url(${src})`);
+    await face.load(); document.fonts.add(face);
+    const c = document.createElement('canvas'); c.width = c.height = 256;
+    const g = c.getContext('2d');
+    g.fillStyle = '#E21B2D'; g.fillRect(0, 0, 256, 256);
+    g.fillStyle = '#FFFFFF'; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+    g.font = 'italic 216px FrictionAnton';
+    g.setTransform(1, 0, -0.12, 1, 18, 0); // slant like the wordmark (Anton has no true italic)
+    g.fillText('F', 128, 222);
+    const b64 = c.toDataURL('image/png').split(',')[1];
+    const errs = await writeSafe('website', [wid()], { favicon: b64 }, wctx());
+    return { favicon: errs.length ? errs : 'ok', bytes: Math.round(b64.length * 0.75) };
+  };
+
   // ------------------------------------------------------------------ real store items from Friction's Loyverse (26 Nov 2026)
   // The item data is PRIVATE (it is read from Loyverse, kept in Tech Nova's private notes) and is passed in as an argument;
   // nothing from Loyverse is stored in this public kit. items: [[loyverseId, posName, loyverseCategory, priceBBD, [[size, sku]], photoFile]]
