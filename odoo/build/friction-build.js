@@ -716,7 +716,8 @@
         const skus = sizes.map((z) => (z[0] ? z[0] + ' = ' : '') + z[1]);
         const sizeVals = sizes.map((z) => valId[z[0]]).filter(Boolean);
         const base = {
-          name, default_code: sizes.length === 1 || new Set(sizes.map((z) => z[1])).size === 1 ? (sizes[0] || [])[1] || false : false,
+          // No Internal Reference: Odoo would put it in the product's web address (/shop/10237-asics-...). SKUs stay in the internal note.
+          name, default_code: false,
           list_price: Number(price) || 0, sale_ok: true, purchase_ok: false, type: 'consu', is_storable: false,
           taxes_id: [[6, 0, []]], categ_id: pcat[lcat || ''], website_ribbon_id: false,
           is_published: live, public_categ_ids: [[6, 0, live ? [foot] : []]], website_sequence: 1000 + order.indexOf(lid),
