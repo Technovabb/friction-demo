@@ -1,0 +1,5 @@
+<data name="Friction copyright line">
+  <xpath expr="//footer//span[hasclass('o_footer_copyright_name')]" position="replace">
+    <span class="o_footer_copyright_name small fr-copy">© <t t-out="datetime.date.today().year"/> Friction Clothing Barbados</span>
+  </xpath>
+</data>

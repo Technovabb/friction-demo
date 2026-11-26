@@ -278,6 +278,24 @@ body.editor_enable .fr-wa-float,body:has(.offcanvas.show) .fr-wa-float,body:has(
 #o_wsale_offcanvas .btn-primary{background:var(--fr-red);border-color:var(--fr-red);border-radius:0;font:800 13px/1.2 var(--fr-sans);letter-spacing:.08em;text-transform:uppercase;padding:13px}
 body.fr-has-wa footer#bottom{padding-bottom:84px}
 
+/* ---------- finishing touches (26 Nov 2026) ---------- */
+/* Odoo's own containers (header, shop, product page, copyright) start at the same edge as the Friction sections */
+#wrapwrap .container{max-width:1440px!important;padding-left:var(--fr-gut)!important;padding-right:var(--fr-gut)!important}
+#bottom .o_footer_copyright .row{--bs-gutter-x:0}
+#bottom .o_footer_copyright [name="footer_copyright_col"]{text-align:left!important}
+.fr-copy{font-size:13px}
+/* Home tiles: photos fill the tile, no grey band */
+.fr-cat img{object-fit:cover;object-position:center;padding:0;mix-blend-mode:normal}
+/* Home "Build the look" cards: photo and name link to the look, red button opens WhatsApp */
+.fr-card a.fr-card-media{display:block;color:inherit}
+.fr-card h3 a{color:inherit!important;text-decoration:none!important}
+.fr-card h3 a:hover{color:var(--fr-red)!important}
+.fr-card .fr-card-cta{width:100%;min-height:44px;margin-top:12px;padding:10px 12px;font-size:11px;letter-spacing:.06em}
+/* Product pages: More looks / More in Footwear */
+.fr-more{border-top:1px solid var(--fr-line);padding-top:clamp(44px,6vw,72px);padding-bottom:clamp(56px,7vw,96px)}
+.fr-more .fr-head h2{font-size:clamp(38px,4.6vw,64px)}
+.fr-more .fr-card-meta h3{margin-bottom:2px}
+
 /* ---------- responsive ---------- */
 @media (max-width:991.98px){
   .fr-intro,.fr-store-in,.fr-split{grid-template-columns:1fr;gap:28px}

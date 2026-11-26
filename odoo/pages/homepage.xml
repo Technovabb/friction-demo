@@ -4,9 +4,9 @@
   <div class="fr-hero-copy">
     <p class="fr-eyebrow">The Dome Mall · Warrens · Barbados</p>
     <h1 class="fr-display">Options<br/>look good<br/>on you.</h1>
-    <p class="fr-hero-lead">Fresh fits, confident layers and head-to-toe streetwear — curated for how Barbados moves.</p>
+    <p class="fr-hero-lead">Men's clothing and footwear at The Dome Mall in Warrens. Message the team on WhatsApp to check sizes before you visit.</p>
     <div class="fr-btns">
-      <a class="fr-btn fr-btn-red" href="/shop">Explore the edit</a>
+      <a class="fr-btn fr-btn-red" href="__CAT:new-arrivals__">Shop New Arrivals</a>
       <a class="fr-btn fr-btn-ghost" href="__PAGE:visit-us__">Visit the store</a>
     </div>
   </div>
@@ -44,7 +44,7 @@
       <p class="fr-eyebrow fr-red">Current rotation</p>
       <h2 class="fr-display">Build the look</h2>
     </div>
-    <a class="fr-link" href="/shop">Shop all looks →</a>
+    <a class="fr-link" href="__CAT:styled-looks__">Shop all looks →</a>
   </div>
   <div class="fr-grid4">
     __LOOKCARD:01__

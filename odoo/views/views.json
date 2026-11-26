@@ -16,5 +16,8 @@
   { "key":"friction_confirmation", "name":"Friction: enquiry received wording", "inherit":"website_sale.confirmation", "file":"confirmation.xml" },
   { "key":"friction_cart_title", "name":"Friction: Your enquiry bag title", "inherit":"website_sale.cart", "file":"cart_title.xml" },
   { "key":"friction_empty_bag", "name":"Friction: empty enquiry bag wording", "inherit":"website_sale.cart_lines", "file":"empty_bag.xml" },
-  { "key":"friction_payment_heading", "name":"Friction: Review and send heading on the last step", "inherit":"website_sale.payment", "file":"payment_heading.xml" }
+  { "key":"friction_payment_heading", "name":"Friction: Review and send heading on the last step", "inherit":"website_sale.payment", "file":"payment_heading.xml" },
+  { "key":"friction_no_wishlist", "name":"Friction: no wishlist link in the header (enquiry-only)", "inherit":"website_sale.header_wishlist_link", "file":"no_wishlist.xml" },
+  { "key":"friction_copyright", "name":"Friction: copyright line", "inherit":"website.layout", "file":"copyright.xml" },
+  { "key":"friction_more_row", "name":"Friction: More looks / More in Footwear on product pages", "inherit":"website_sale.product", "file":"more_row.xml" }
 ]

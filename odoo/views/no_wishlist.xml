@@ -1,0 +1,3 @@
+<data name="Friction: no wishlist link in the header">
+  <xpath expr="//li" position="replace"/>
+</data>

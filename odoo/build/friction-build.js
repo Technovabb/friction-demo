@@ -155,7 +155,9 @@
     // Odoo renders this website's own copy of a template when one exists
     const v = await rpc('ir.ui.view', 'search_read', [[['key', '=', key], ['website_id', 'in', [wid(), false]]]],
       { fields: ['id', 'website_id', 'active', 'arch_db'], context: { active_test: false } });
-    return v.find((x) => idOf(x.website_id) === wid()) || v.find((x) => !x.website_id) || null;
+    // an archived website copy is skipped by Odoo (it renders the generic one), so only an active copy wins
+    return v.find((x) => idOf(x.website_id) === wid() && x.active) || v.find((x) => !x.website_id) ||
+      v.find((x) => idOf(x.website_id) === wid()) || null;
   }
 
   // ------------------------------------------------------------------ introspect
@@ -218,6 +220,7 @@
       shop_ppg: 20, shop_ppr: 4, shop_default_sort: 'website_sequence asc', account_on_checkout: 'optional',
       ecommerce_access: 'everyone', prevent_sale: true, prevent_sale_for: 'specific_categories',
       prevent_sale_for_categories: [[6, 0, pcats]], contact_us_link_url: '/visit-us',
+      auth_signup_uninvited: 'b2b', // accounts by invitation only: no "Don't have an account?" on the sign-in page
       product_page_image_ratio: 'auto', product_page_image_ratio_mobile: 'auto', product_page_image_width: '50_pc',
       social_default_image: share, robots_txt: 'User-agent: *\nDisallow: /',
     }, out.skipped);
@@ -479,10 +482,13 @@
           const L = C.looks.find((x) => x.n === arg);
           if (!L || !pid) return null;
           const ribbon = C.ribbons.find((r) => r.key === L.badge);
-          return `<a class="fr-card" href="${esc(purl[pid] || '/shop/' + pid)}"><div class="fr-card-media">`
+          // A div, not one big link, so the card can hold its own WhatsApp button (custom_code_footer.html fills in the link)
+          const href = esc(purl[pid] || '/shop/' + pid);
+          return `<div class="fr-card"><a class="fr-card-media" href="${href}">`
             + `<img src="/web/image/product.template/${pid}/image_1024" alt="${esc(L.name + ': ' + L.visible.replace(/;/g, ','))}" loading="lazy"/>`
             + (ribbon ? `<span class="fr-badge fr-badge-${L.badge}">${esc(ribbon.name)}</span>` : '')
-            + `</div><div class="fr-card-meta"><span class="fr-look-tag">Styled Look</span><h3>${esc(L.name)}</h3><p>${esc(L.note)}</p><p class="fr-por-s">Price on request</p></div></a>`;
+            + `</a><div class="fr-card-meta"><span class="fr-look-tag">Styled Look</span><h3><a href="${href}">${esc(L.name)}</a></h3><p>${esc(L.note)}</p><p class="fr-por-s">Price on request</p>`
+            + `<a class="fr-btn fr-btn-red fr-card-cta" href="${BIZ.wa}" target="_blank" rel="noopener" data-look="${esc(L.name)}">Check Price &amp; Availability</a></div></div>`;
         }
         default: return null;
       }

@@ -7,7 +7,8 @@
       </div>
       <div>
         <h3>Explore</h3>
-        <a href="/shop">Shop</a>
+        <a href="__CAT:styled-looks__">Clothing</a>
+        <a href="__CAT:footwear__">Footwear</a>
         <a href="__CAT:new-arrivals__">New Arrivals</a>
         <a href="__PAGE:our-story__">Our Story</a>
         <a href="__PAGE:visit-us__">Visit Us</a>

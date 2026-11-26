@@ -1,0 +1,30 @@
+<data name="Friction: More looks / More in Footwear row on product pages">
+  <xpath expr="//section[@id='product_detail']" position="after">
+    <t t-set="fr_more_item" t-value="bool(product.list_price)"/>
+    <t t-set="fr_more_cat" t-value="product.public_categ_ids[:1]"/>
+    <t t-set="fr_more" t-value="fr_more_cat and product.search([('public_categ_ids', 'child_of', fr_more_cat.ids), ('id', '!=', product.id), ('is_published', '=', True)] + website.website_domain(), limit=4, order='website_sequence, id')"/>
+    <section t-if="fr_more" class="fr-more fr-wrapx" aria-labelledby="fr-more-title">
+      <div class="fr-head">
+        <div>
+          <p class="fr-eyebrow fr-red">Keep browsing</p>
+          <h2 id="fr-more-title" class="fr-display"><t t-if="fr_more_item">More in <t t-out="fr_more_cat.name"/></t><t t-else="">More looks</t></h2>
+        </div>
+        <a class="fr-link" t-att-href="fr_more_cat.website_url">See all <t t-out="fr_more_cat.name"/> →</a>
+      </div>
+      <div class="fr-grid4">
+        <t t-foreach="fr_more" t-as="fr_p">
+          <a class="fr-card" t-att-href="fr_p.website_url">
+            <div class="fr-card-media"><img t-attf-src="/web/image/product.template/#{fr_p.id}/image_512" t-att-alt="fr_p.name" loading="lazy"/></div>
+            <div class="fr-card-meta">
+              <span t-if="fr_p.list_price" class="fr-look-tag" t-out="fr_p.public_categ_ids[:1].name or 'In store'"/>
+              <span t-else="" class="fr-look-tag">Styled Look</span>
+              <h3 t-out="fr_p.name"/>
+              <p t-if="fr_p.list_price" class="fr-por-s">BBD $<t t-out="fr_p.list_price" t-options="{'widget': 'float', 'precision': 2}"/></p>
+              <p t-else="" class="fr-por-s">Price on request</p>
+            </div>
+          </a>
+        </t>
+      </div>
+    </section>
+  </xpath>
+</data>

@@ -8,7 +8,6 @@
   { "key": "shop-graphic-tees", "name": "Graphic Tees", "cat": "graphic-tees", "menu": true, "parent": "shop", "sequence": 3 },
   { "key": "shop-sets", "name": "Sets", "cat": "sets", "menu": true, "parent": "shop", "sequence": 4 },
   { "key": "shop-denim-looks", "name": "Denim Looks", "cat": "denim-looks", "menu": true, "parent": "shop", "sequence": 5 },
-  { "key": "shop-footwear", "name": "Footwear", "cat": "footwear", "menu": true, "parent": "shop", "sequence": 6 },
   { "key": "new-arrivals", "name": "New Arrivals", "cat": "new-arrivals", "menu": true, "sequence": 20 },
   { "key": "graphic-tees", "name": "Graphic Tees", "cat": "graphic-tees", "menu": true, "sequence": 30 },
   { "key": "sets", "name": "Sets", "cat": "sets", "menu": true, "sequence": 40 },
