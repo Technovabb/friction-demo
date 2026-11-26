@@ -658,19 +658,23 @@
   FRB.favicon = async () => {
     need();
     const css = await (await fetch('https://fonts.googleapis.com/css2?family=Anton&display=block', { credentials: 'omit' })).text();
-    const src = (css.match(/url\((https:[^)]+)\)/) || [])[1];
+    // Google splits the font into language subsets; only the "latin" one has the letter F
+    const src = (css.match(/\/\*\s*latin\s*\*\/[^}]*?url\((https:[^)]+)\)/) || css.match(/url\((https:[^)]+)\)/) || [])[1];
     if (!src) throw new Error('Could not find the Anton font file');
-    const face = new FontFace('FrictionAnton', `url(${src})`);
+    const face = new FontFace('FrictionAntonLatin', `url(${src})`);
     await face.load(); document.fonts.add(face);
+    const probe = document.createElement('canvas').getContext('2d');
+    probe.font = '230px FrictionAntonLatin'; const wA = probe.measureText('F').width;
+    probe.font = '230px serif'; const wS = probe.measureText('F').width;
+    if (Math.abs(wA - wS) < 1) throw new Error('Anton did not load; favicon not saved');
     const c = document.createElement('canvas'); c.width = c.height = 256;
     const g = c.getContext('2d');
     g.fillStyle = '#E21B2D'; g.fillRect(0, 0, 256, 256);
     g.fillStyle = '#FFFFFF'; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
     // no "italic" in the font string: Anton has only an upright face, so asking for italic falls back to a serif
-    g.font = '230px FrictionAnton';
+    g.font = '230px FrictionAntonLatin';
     g.setTransform(1, 0, -0.14, 1, 28, 0); // slant like the wordmark instead
     g.fillText('F', 128, 227);
-    if (!document.fonts.check('230px FrictionAnton')) throw new Error('Anton did not load; favicon not saved');
     const b64 = c.toDataURL('image/png').split(',')[1];
     const errs = await writeSafe('website', [wid()], { favicon: b64 }, wctx());
     return { favicon: errs.length ? errs : 'ok', bytes: Math.round(b64.length * 0.75) };
