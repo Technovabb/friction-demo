@@ -682,8 +682,10 @@
 
   // ------------------------------------------------------------------ real store items from Friction's Loyverse (26 Nov 2026)
   // The item data is PRIVATE (it is read from Loyverse, kept in Tech Nova's private notes) and is passed in as an argument;
-  // nothing from Loyverse is stored in this public kit. items: [[loyverseId, posName, loyverseCategory, priceBBD, [[size, sku]], photoFile]]
+  // nothing from Loyverse is stored in this public kit. items: [[loyverseId, posName, loyverseCategory, priceBBD, [[size, sku, stockOnHand]], photoFile]]
   // Items with a photo (photos in loyverse-photos/<id>.jpg) are published in Footwear; the rest are loaded unpublished.
+  // Since 26 Nov 2026 items are SOLD ONLINE (click and collect): each size is a real variant of Odoo's "Size" attribute
+  // with its own stock count, so a sold-out size can't be ordered and shows the WhatsApp enquiry instead.
   const KEEP_CAPS = new Set(['GS', 'AAPE', 'BBC', 'EPTM', 'TRNCHS', 'KDNK', 'PSD', 'NY', 'LA', 'WKND', 'ASICS', 'DUA', 'TD', 'II', 'III']);
   const SMALL_WORDS = new Set(['and', 'with', 'of', 'the', 'in']);
   FRB.itemName = (pos) => {
@@ -713,9 +715,15 @@
     if (!Array.isArray(items) || !items.length) throw new Error('Pass the items from the private Loyverse file.');
     const { checked = '26 Nov 2026', offset = 0, limit = 25 } = opts;
     const T = 'product.template', A = 'product.attribute', V = 'product.attribute.value', PCI = 'product.category';
-    const out = { created: [], updated: [], published: [], errors: [] };
-    // Size list (no variants: one product per item, the sizes are information only)
-    const attr = await upsert('attr_size_store', A, pick(A, { name: 'Size (in store)', create_variant: 'no_variant', display_type: 'select', visibility: 'hidden' }));
+    const out = { created: [], updated: [], published: [], stock: 0, errors: [] };
+    // Sizes are real variants of Odoo's own "Size" attribute (product.pa_size), each with a stock count
+    const sizeX = await rpc('ir.model.data', 'search_read', [[['module', '=', 'product'], ['name', '=', 'pa_size'], ['model', '=', A]]], { fields: ['res_id'] });
+    let attr = sizeX.length ? { id: sizeX[0].res_id } : null;
+    if (!attr) attr = await upsert('attr_size', A, pick(A, { name: 'Size', create_variant: 'always', display_type: 'pills' }));
+    await rpc(A, 'write', [[attr.id], pick(A, { create_variant: 'always', display_type: 'pills', visibility: 'visible' })]);
+    const stockLoc = (await rpc('stock.warehouse', 'search_read', [[['company_id', '=', FRB.cfg.company || 1]]], { fields: ['lot_stock_id'], limit: 1 }))[0];
+    if (!stockLoc) throw new Error('No warehouse found for the stock counts.');
+    const LOC = idOf(stockLoc.lot_stock_id);
     const allSizes = [...new Set(items.flatMap((it) => (it[4] || []).map((z) => z[0]).filter(Boolean)))]
       .sort((a, b) => { const x = sizeRank(a), y = sizeRank(b); return x[0] - y[0] || x[1] - y[1] || a.localeCompare(b); });
     const have = await rpc(V, 'search_read', [[['attribute_id', '=', attr.id]]], { fields: ['id', 'name'] });
@@ -751,13 +759,15 @@
         const base = {
           // No Internal Reference: Odoo would put it in the product's web address (/shop/10237-asics-...). SKUs stay in the internal note.
           name, default_code: false,
-          list_price: Number(price) || 0, sale_ok: true, purchase_ok: false, type: 'consu', is_storable: false,
+          list_price: Number(price) || 0, sale_ok: true, purchase_ok: false, type: 'consu', is_storable: true,
           taxes_id: [[6, 0, []]], categ_id: pcat[lcat || ''], website_ribbon_id: false,
           is_published: live, public_categ_ids: [[6, 0, live ? [foot] : []]], website_sequence: 1000 + order.indexOf(lid),
-          allow_out_of_stock_order: true, show_availability: false, description_sale: false,
-          description: `<p>Loaded from Friction's Loyverse on ${esc(checked)} (Loyverse item ${lid}, POS name "${esc(pos)}", category "${esc(lcat || 'none')}"). SKUs in stock that day: ${esc(skus.join(', ') || 'none')}. Prices and sizes do not update by themselves.</p>`,
+          // Sold out = can't be ordered online; the product page then shows the WhatsApp enquiry instead of Add to cart
+          allow_out_of_stock_order: false, show_availability: false, description_sale: false,
+          out_of_stock_message: '<p>Sold out online in this size. Message Friction on WhatsApp and the team will check the shelf for you.</p>',
+          description: `<p>Loaded from Friction's Loyverse on ${esc(checked)} (Loyverse item ${lid}, POS name "${esc(pos)}", category "${esc(lcat || 'none')}"). SKUs in stock that day: ${esc(skus.join(', ') || 'none')}. Prices and stock do not update by themselves: re-run the Loyverse step to refresh them.</p>`,
           website_meta_title: `${name} | Friction Clothing Barbados`,
-          website_meta_description: `${name} at Friction Clothing, The Dome Mall, Warrens, Barbados. BBD $${Number(price).toFixed(2)}. Message Friction to check your size before you visit.`,
+          website_meta_description: `${name} at Friction Clothing, The Dome Mall, Warrens, Barbados. BBD $${Number(price).toFixed(2)}. Order online and collect in store.`,
         };
         if (live) base.image_1920 = await fetchB64(`loyverse-photos/${photo}`);
         const vals = pick(T, base);
@@ -765,10 +775,32 @@
         let id = await xid(key, T);
         if (id) { await rpc(T, 'write', [[id], vals]); out.updated.push(name); }
         else { id = idOf(await rpc(T, 'create', [vals])); await setXid(key, T, id); out.created.push(name); }
-        const lines = await rpc('product.template.attribute.line', 'search', [[['product_tmpl_id', '=', id]]]);
-        const cmds = lines.map((l) => [2, l]);
-        if (sizeVals.length) cmds.push([0, 0, { attribute_id: attr.id, value_ids: [[6, 0, sizeVals]] }]);
-        if (cmds.length) await rpc(T, 'write', [[id], { attribute_line_ids: cmds }]);
+        // Size line: keep it when it already lists exactly these sizes (variants and their stock survive), else rebuild
+        const L = 'product.template.attribute.line';
+        const lines = await rpc(L, 'search_read', [[['product_tmpl_id', '=', id]]], { fields: ['attribute_id', 'value_ids'] });
+        const same = (l) => idOf(l.attribute_id) === attr.id && l.value_ids.length === sizeVals.length && sizeVals.every((v) => l.value_ids.includes(v));
+        const keep = lines.length === (sizeVals.length ? 1 : 0) && (!sizeVals.length || same(lines[0]));
+        if (!keep) {
+          const cmds = lines.map((l) => [2, l.id]);
+          if (sizeVals.length) cmds.push([0, 0, { attribute_id: attr.id, value_ids: [[6, 0, sizeVals]] }]);
+          await rpc(T, 'write', [[id], { attribute_line_ids: cmds }]);
+        }
+        // Stock on hand per size (an inventory adjustment in WH/Stock)
+        const variants = await rpc('product.product', 'search_read', [[['product_tmpl_id', '=', id]]], { fields: ['product_template_attribute_value_ids'] });
+        const ptavs = variants.flatMap((v) => v.product_template_attribute_value_ids);
+        const ptavVal = {};
+        if (ptavs.length) for (const p of await rpc('product.template.attribute.value', 'read', [ptavs], { fields: ['product_attribute_value_id'] })) ptavVal[p.id] = idOf(p.product_attribute_value_id);
+        const qtyOf = (v) => {
+          if (!sizeVals.length) return sizes.reduce((n, z) => n + (Number(z[2]) || 0), 0);
+          const val = v.product_template_attribute_value_ids.map((p) => ptavVal[p]).find(Boolean);
+          const z = sizes.find((s) => valId[s[0]] === val);
+          return z ? Number(z[2]) || 0 : 0;
+        };
+        const quants = [];
+        for (const v of variants) {
+          quants.push(idOf(await rpc('stock.quant', 'create', [{ product_id: v.id, location_id: LOC, inventory_quantity: qtyOf(v) }], { context: { inventory_mode: true } })));
+        }
+        if (quants.length) { await rpc('stock.quant', 'action_apply_inventory', [quants], { context: { inventory_mode: true } }); out.stock += quants.length; }
         if (live) out.published.push(name);
       } catch (e) { out.errors.push(lid + ': ' + short(e)); }
     }
