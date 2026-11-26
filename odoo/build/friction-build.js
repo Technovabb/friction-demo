@@ -211,11 +211,13 @@
       classes = classes.replace(/\bo_wsale_products_opt_(has_wishlist|wishlist_fixed|wishlist_inline|has_comparison)\b/g, '').replace(/\s+/g, ' ');
     }
     const share = await fetchB64('images/share-1200x630.jpg');
+    // Enquiry-only for priced store items too: "Hide Add To Cart" for every shop category (since 26 Nov 2026)
+    const pcats = await rpc('product.public.category', 'search', [[]]);
     const vals = pick('website', {
       name: BIZ.site, tz: 'America/Barbados', configurator_done: true, cookies_bar: false,
       shop_ppg: 20, shop_ppr: 4, shop_default_sort: 'website_sequence asc', account_on_checkout: 'optional',
-      // Enquiry-only: Odoo's "Hide Add To Cart" for $0 products also stops anything reaching the cart or checkout
-      ecommerce_access: 'everyone', prevent_sale: true, prevent_sale_for: 'zero_price', contact_us_link_url: '/visit-us',
+      ecommerce_access: 'everyone', prevent_sale: true, prevent_sale_for: 'specific_categories',
+      prevent_sale_for_categories: [[6, 0, pcats]], contact_us_link_url: '/visit-us',
       product_page_image_ratio: 'auto', product_page_image_ratio_mobile: 'auto', product_page_image_width: '50_pc',
       social_default_image: share, robots_txt: 'User-agent: *\nDisallow: /',
     }, out.skipped);

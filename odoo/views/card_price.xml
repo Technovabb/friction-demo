@@ -1,5 +1,6 @@
 <data name="Friction card price">
   <xpath expr="//div[hasclass('product_price')]" position="replace">
-    <div class="product_price fr-por-card" aria-label="Price information">Price on request</div>
+    <div t-if="product.list_price" class="product_price fr-por-card fr-price" aria-label="Price">BBD $<span t-out="product.list_price" t-options="{'widget': 'float', 'precision': 2}"/></div>
+    <div t-else="" class="product_price fr-por-card" aria-label="Price information">Price on request</div>
   </xpath>
 </data>

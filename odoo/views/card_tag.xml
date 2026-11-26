@@ -1,5 +1,6 @@
-<data name="Friction styled look tag on cards">
+<data name="Friction tag on cards: category for store items, Styled Look for looks">
   <xpath expr="//h6[hasclass('o_wsale_products_item_title')]" position="before">
-    <span class="fr-look-tag">Styled Look</span>
+    <span t-if="product.list_price" class="fr-look-tag fr-item-tag" t-out="product.public_categ_ids[:1].name or 'In store'"/>
+    <span t-else="" class="fr-look-tag">Styled Look</span>
   </xpath>
 </data>

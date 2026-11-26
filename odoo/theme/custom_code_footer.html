@@ -5,11 +5,14 @@
   var WA = 'https://wa.me/12466221748';
   var KEY = 'friction_enquiry_bag';
   var ASK = 'Can you confirm the available items, sizes and price?';
+  var ASK_ITEM = 'Is it still available?';
   function waLink(text) { return WA + '?text=' + encodeURIComponent(text); }
+  // Store items (priced, from Loyverse) carry a SKU; styled looks don't
+  function detail(name, size, sku) { var p = []; if (size) p.push('size ' + size); if (sku) p.push('SKU ' + sku); return name + (p.length ? ' (' + p.join(', ') + ')' : ''); }
+  function money(v) { var n = Number(v); return n ? 'BBD $' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''; }
   function ready(fn) { if (document.readyState !== 'loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function localPath(u) { return /^\/[^/]/.test(String(u || '')) ? String(u) : '/shop'; }
-  function withSize(look, size) { return look + (size ? ' (size ' + size + ')' : ''); }
   function load() { try { var v = JSON.parse(localStorage.getItem(KEY) || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; } }
   function store(items) { try { localStorage.setItem(KEY, JSON.stringify(items)); return true; } catch (e) { return false; } }
   function updateCount() {
@@ -20,14 +23,17 @@
   function renderBag(host, emptyHtml) {
     var items = load();
     if (!items.length) { host.innerHTML = emptyHtml; return; }
-    var lines = items.map(function (it, i) { return (i + 1) + '. ' + withSize(it.name, it.size); });
-    var text = 'Hi Friction, I’m interested in these looks from your website:\n' + lines.join('\n') + '\n' + ASK;
+    var anyLook = items.some(function (it) { return !money(it.price); });
+    var lines = items.map(function (it, i) { return (i + 1) + '. ' + detail(it.name, it.size, it.sku) + (money(it.price) ? ' – ' + money(it.price) : ''); });
+    var text = 'Hi Friction, I’m interested in these from your website:\n' + lines.join('\n') + '\n' + (anyLook ? ASK : 'Can you confirm they’re available?');
     host.innerHTML = '<ul class="fr-bag-list">' + items.map(function (it, i) {
-      var url = esc(localPath(it.url)), img = esc(localPath(it.img));
+      var url = esc(localPath(it.url)), img = esc(localPath(it.img)), price = money(it.price);
       return '<li class="fr-bag-item">'
         + '<a class="fr-bag-img" href="' + url + '"><img src="' + img + '" alt="' + esc(it.name) + '" loading="lazy"/></a>'
-        + '<div class="fr-bag-info"><span class="fr-look-tag">Styled Look</span><a href="' + url + '">' + esc(it.name) + '</a>'
-        + '<p>' + (it.size ? 'Size ' + esc(it.size) + ' (availability to confirm)' : 'Size not chosen') + ' · Price on request</p></div>'
+        + '<div class="fr-bag-info"><span class="fr-look-tag">' + (price ? 'In store' : 'Styled Look') + '</span><a href="' + url + '">' + esc(it.name) + '</a>'
+        + '<p>' + (price
+          ? (it.size ? 'Size ' + esc(it.size) : 'Size not chosen') + (it.sku ? ' · SKU ' + esc(it.sku) : '') + ' · ' + esc(price)
+          : (it.size ? 'Size ' + esc(it.size) + ' (availability to confirm)' : 'Size not chosen') + ' · Price on request') + '</p></div>'
         + '<button type="button" class="fr-bag-remove" data-i="' + i + '" aria-label="Remove ' + esc(it.name) + ' from your Enquiry Bag">Remove</button>'
         + '</li>';
     }).join('') + '</ul>'
@@ -68,9 +74,10 @@
       document.body.classList.add('fr-has-wa');
     }
 
-    // Shop cards: Check Price & Availability opens WhatsApp with the look name
+    // Shop cards: open WhatsApp with the look name, or the item name and SKU
     document.querySelectorAll('.fr-card-cta').forEach(function (a) {
-      a.href = waLink('Hi Friction, I’m interested in the ' + (a.getAttribute('data-look') || 'look') + ' from your website. ' + ASK);
+      var item = a.hasAttribute('data-item');
+      a.href = waLink('Hi Friction, I’m interested in the ' + detail(a.getAttribute('data-look') || 'look', '', a.getAttribute('data-sku')) + ' from your website. ' + (item ? ASK_ITEM : ASK));
     });
 
     // Product page: the optional size goes into every message; no size is chosen for the shopper
@@ -80,10 +87,11 @@
       var size = function () { return sel && sel.value ? sel.value : ''; };
       var refresh = function () {
         document.querySelectorAll('.fr-check').forEach(function (a) {
-          a.href = waLink('Hi Friction, I’m interested in the ' + withSize(a.getAttribute('data-look'), size()) + ' from your website. ' + ASK);
+          var item = a.hasAttribute('data-item');
+          a.href = waLink('Hi Friction, I’m interested in the ' + detail(a.getAttribute('data-look'), size(), a.getAttribute('data-sku')) + ' from your website. ' + (item ? ASK_ITEM : ASK));
         });
         document.querySelectorAll('.fr-wa-look').forEach(function (a) {
-          a.href = waLink('Hi Friction, I have a question about the ' + withSize(a.getAttribute('data-look'), size()) + ' from your website.');
+          a.href = waLink('Hi Friction, I have a question about the ' + detail(a.getAttribute('data-look'), size(), a.getAttribute('data-sku')) + ' from your website.');
         });
       };
       refresh();
@@ -95,9 +103,9 @@
         b.addEventListener('click', function () {
           var items = load(), s = size(), id = String(b.getAttribute('data-pid'));
           var exists = items.some(function (it) { return it.id === id && it.size === s; });
-          if (!exists) items.push({ id: id, name: b.getAttribute('data-look'), url: b.getAttribute('data-url'), img: b.getAttribute('data-img'), size: s });
+          if (!exists) items.push({ id: id, name: b.getAttribute('data-look'), url: b.getAttribute('data-url'), img: b.getAttribute('data-img'), size: s, sku: b.getAttribute('data-sku') || '', price: b.getAttribute('data-price') || '' });
           var msg = document.querySelector('.fr-bag-msg');
-          if (!store(items)) { if (msg) msg.textContent = 'This browser could not save your bag. Use Check Price & Availability instead.'; return; }
+          if (!store(items)) { if (msg) msg.textContent = 'This browser could not save your bag. Use the WhatsApp button instead.'; return; }
           updateCount();
           if (msg) msg.innerHTML = (exists ? 'Already in your Enquiry Bag. ' : 'Added to your Enquiry Bag' + (s ? ' (size ' + esc(s) + ')' : '') + '. ') + '<a href="/enquiry-bag">View bag</a>';
         });

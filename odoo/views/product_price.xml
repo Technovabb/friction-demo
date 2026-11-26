@@ -1,7 +1,15 @@
 <data name="Friction product price">
   <xpath expr="//div[@name='product_price']" position="after">
-    <div class="fr-por">Price on request</div>
-    <p class="fr-avail"><span class="fr-dot" aria-hidden="true"></span>Availability to be confirmed</p>
-    <p class="fr-disclaimer">This photograph shows a styled look. Items may be sold separately. Message Friction to confirm which pieces, sizes and prices are currently available.</p>
+    <t t-if="product.list_price">
+      <t t-set="fr_checked" t-value="request.env['ir.config_parameter'].sudo().get_param('friction.stock_checked', '')"/>
+      <div class="fr-por fr-price">BBD $<span t-out="product.list_price" t-options="{'widget': 'float', 'precision': 2}"/></div>
+      <p class="fr-avail fr-avail-in"><span class="fr-dot" aria-hidden="true"></span>In stock at the store<t t-if="fr_checked"> on <t t-out="fr_checked"/></t></p>
+      <p class="fr-disclaimer">Stock changes quickly. Message Friction to confirm your size before you visit. No payment is taken online.</p>
+    </t>
+    <t t-else="">
+      <div class="fr-por">Price on request</div>
+      <p class="fr-avail"><span class="fr-dot" aria-hidden="true"></span>Availability to be confirmed</p>
+      <p class="fr-disclaimer">This photograph shows a styled look. Items may be sold separately. Message Friction to confirm which pieces, sizes and prices are currently available.</p>
+    </t>
   </xpath>
 </data>

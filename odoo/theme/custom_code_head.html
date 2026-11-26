@@ -206,6 +206,11 @@ h2.o_wsale_category_title a{color:var(--fr-red)!important;font-weight:700;text-d
 div[name="product_price_container"],div[name="product_price"] .oe_price,div[name="product_price"] .oe_default_price,div[name="product_price"] del,div[name="tax_indicator"]{display:none!important}
 .fr-avail{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;margin:8px 0 18px}
 .fr-dot{width:9px;height:9px;border-radius:50%;background:#E4A900;flex:none}
+.fr-avail-in .fr-dot{background:#1f9d55}
+.fr-price{color:var(--fr-ink);letter-spacing:.01em}
+.fr-por-card.fr-price{font-size:14px}
+/* Store items: sizes come from our own list; Odoo's variant picker stays hidden */
+#product_detail .js_add_cart_variants{display:none!important}
 #product_detail .attribute_name,#product_detail .attribute_name span,#product_detail .variant_attribute .attribute_name,#product_detail .o_variant_attribute_name,#product_detail .variant_attribute strong{font-family:var(--fr-sans)!important;font-size:13px!important;font-weight:800!important;text-transform:none;letter-spacing:0}
 #product_detail .o_variant_pills,#product_detail .btn-check+.btn,#product_detail .o_variant_pills_input_value{border-radius:0!important}
 .fr-pextra{margin-top:4px}
