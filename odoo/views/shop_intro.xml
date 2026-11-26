@@ -4,7 +4,9 @@
       <div class="fr-wrapx">
         <p class="fr-eyebrow fr-red">Friction Clothing · The Dome Mall</p>
         <h1 class="fr-display"><t t-if="category" t-out="category.name"/><t t-elif="search">Results for “<t t-out="search"/>”</t><t t-else="">Shop the Edit</t></h1>
-        <p>Styled looks from Friction Clothing. Tap Check Price &amp; Availability to ask the team on WhatsApp, or save looks to your Enquiry Bag and send them together.</p>
+        <p t-if="category and 'Styled Looks' in (category.name, category.parent_id.name)">Styled looks from Friction Clothing. Tap Check Price &amp; Availability to ask the team on WhatsApp, or save looks to your Enquiry Bag and send them together.</p>
+        <p t-elif="category and category.name == 'Footwear'">Shoes in stock at the store, with prices. Message Friction on WhatsApp to check your size before you visit, or save pairs to your Enquiry Bag and send them together. No payment is taken online.</p>
+        <p t-else="">Shoes in stock at the store, with prices, and styled looks from Friction Clothing. Ask the team on WhatsApp, or save pieces to your Enquiry Bag and send them together. No payment is taken online.</p>
       </div>
     </section>
   </xpath>

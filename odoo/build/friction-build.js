@@ -19,7 +19,7 @@
   const W = window;
   const prev = W.FRB || {};
   const FRB = (W.FRB = {});
-  FRB.VERSION = '1.0.0 (2026-11-02)';
+  FRB.VERSION = '1.1.0 (2026-11-26)';
   FRB.BASE = prev.BASE || W.FRB_BASE || 'https://technovabb.com/friction-demo/odoo/';
   const MOD = 'friction_demo';
 
@@ -265,12 +265,13 @@
       const name = 'cat_' + c.key.replace(/-/g, '_');
       let id = await xid(name, PC);
       if (!id) { // adopt a same-name category made by hand
-        const ex = await rpc(PC, 'search', [[['name', '=', c.name], ['parent_id', '=', false]]]);
+        const ex = await rpc(PC, 'search', [[['name', '=', c.name]]]);
         if (ex.length) { id = ex[0]; await setXid(name, PC, id); }
       }
-      const vals = pick(PC, { name: c.name, sequence: c.sequence, parent_id: false,
+      // Parents come first in catalogue.json (Styled Looks > New Arrivals ...); Footwear holds the real Loyverse shoes
+      const vals = pick(PC, { name: c.name, sequence: c.sequence, parent_id: (c.parent && FRB.cfg.cat[c.parent]) || false,
         website_meta_title: `${c.name} | Friction Clothing Barbados`,
-        website_meta_description: `${c.name} at Friction Clothing Barbados, The Dome Mall, Warrens. Prices and sizes on request.` });
+        website_meta_description: c.meta || `${c.name} at Friction Clothing Barbados, The Dome Mall, Warrens. Prices and sizes on request.` });
       if (id) { await rpc(PC, 'write', [[id], vals]); out.updated.push(c.key); }
       else { id = idOf(await rpc(PC, 'create', [vals])); await setXid(name, PC, id); out.created.push(c.key); }
       FRB.cfg.cat[c.key] = id;
@@ -643,6 +644,101 @@
       if (a === v.arch_db) continue;
       try { await rpc('ir.ui.view', 'write', [[v.id], { arch_db: a }], { context: wctx() }); out.changed.push(v.key); } catch (e) { out.errors.push(v.key + ': ' + short(e)); }
     }
+    return out;
+  };
+
+  // ------------------------------------------------------------------ real store items from Friction's Loyverse (26 Nov 2026)
+  // The item data is PRIVATE (it is read from Loyverse, kept in Tech Nova's private notes) and is passed in as an argument;
+  // nothing from Loyverse is stored in this public kit. items: [[loyverseId, posName, loyverseCategory, priceBBD, [[size, sku]], photoFile]]
+  // Items with a photo (photos in loyverse-photos/<id>.jpg) are published in Footwear; the rest are loaded unpublished.
+  const KEEP_CAPS = new Set(['GS', 'AAPE', 'BBC', 'EPTM', 'TRNCHS', 'KDNK', 'PSD', 'NY', 'LA', 'WKND', 'ASICS', 'DUA', 'TD', 'II', 'III']);
+  const SMALL_WORDS = new Set(['and', 'with', 'of', 'the', 'in']);
+  FRB.itemName = (pos) => {
+    let s = String(pos || '').trim().replace(/\s+/g, ' ')
+      .replace(/\bAIRFORCE\b/gi, 'AIR FORCE').replace(/\bAIRMAX\b/gi, 'AIR MAX')
+      .replace(/([A-Za-z]{2,})&([A-Za-z]{2,})/g, '$1 & $2');
+    let first = true;
+    return s.replace(/[A-Za-z][A-Za-z']*/g, (w) => {
+      const u = w.toUpperCase(), l = w.toLowerCase(), wasFirst = first; first = false;
+      if (KEEP_CAPS.has(u)) return u;
+      if (!wasFirst && SMALL_WORDS.has(l)) return l;
+      return u[0] + l.slice(1);
+    });
+  };
+  const sizeRank = (s) => {
+    const letters = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL'];
+    if (letters.includes(s)) return [0, letters.indexOf(s)];
+    const n = parseFloat(s);
+    if (/Y$/.test(s)) return [1, n];
+    if (/W\//.test(s)) return [3, n];
+    if (!isNaN(n) && n < 20) return [2, n];
+    if (!isNaN(n)) return [4, n];
+    return [5, 0];
+  };
+  FRB.loyverse = async (items, opts = {}) => {
+    need();
+    if (!Array.isArray(items) || !items.length) throw new Error('Pass the items from the private Loyverse file.');
+    const { checked = '26 Nov 2026', offset = 0, limit = 25 } = opts;
+    const T = 'product.template', A = 'product.attribute', V = 'product.attribute.value', PCI = 'product.category';
+    const out = { created: [], updated: [], published: [], errors: [] };
+    // Size list (no variants: one product per item, the sizes are information only)
+    const attr = await upsert('attr_size_store', A, pick(A, { name: 'Size (in store)', create_variant: 'no_variant', display_type: 'select', visibility: 'hidden' }));
+    const allSizes = [...new Set(items.flatMap((it) => (it[4] || []).map((z) => z[0]).filter(Boolean)))]
+      .sort((a, b) => { const x = sizeRank(a), y = sizeRank(b); return x[0] - y[0] || x[1] - y[1] || a.localeCompare(b); });
+    const have = await rpc(V, 'search_read', [[['attribute_id', '=', attr.id]]], { fields: ['id', 'name'] });
+    const valId = {};
+    for (const [i, n] of allSizes.entries()) {
+      let v = have.find((x) => x.name === n);
+      if (v) await rpc(V, 'write', [[v.id], { sequence: i + 1 }]);
+      else v = { id: idOf(await rpc(V, 'create', [{ attribute_id: attr.id, name: n, sequence: i + 1 }])) };
+      valId[n] = v.id;
+    }
+    // Internal product categories mirror Loyverse's (back office only; no empty shop categories)
+    const root = await upsert('pcat_loyverse', PCI, { name: 'Loyverse' });
+    const pcat = {};
+    for (const c of [...new Set(items.map((it) => it[2] || ''))]) {
+      const nm = c ? (c === c.toUpperCase() ? c[0] + c.slice(1).toLowerCase() : c) : 'Uncategorised';
+      pcat[c] = (await upsert('pcat_loyverse_' + (nm.toLowerCase().replace(/[^a-z0-9]+/g, '_')), PCI, { name: nm, parent_id: root.id })).id;
+    }
+    // "In stock on" date shown on the site
+    await rpc('ir.config_parameter', 'set_param', ['friction.stock_checked', checked]);
+    const foot = FRB.cfg.cat && FRB.cfg.cat.footwear;
+    if (!foot) throw new Error('Run categories first (Footwear category missing).');
+    // The looks leave Footwear: it now lists the real shoes
+    const lookIds = Object.values(FRB.cfg.prod || {});
+    if (lookIds.length && offset === 0) await rpc(T, 'write', [lookIds, { public_categ_ids: [[3, foot]] }]);
+    // Newest Loyverse items first, after the 16 looks (website_sequence 10..160)
+    const order = items.map((it) => it[0]).sort((a, b) => b - a);
+    for (const it of items.slice(offset, offset + limit)) {
+      const [lid, pos, lcat, price, sizes = [], photo] = it;
+      try {
+        const name = FRB.itemName(pos), live = !!photo;
+        const skus = sizes.map((z) => (z[0] ? z[0] + ' = ' : '') + z[1]);
+        const sizeVals = sizes.map((z) => valId[z[0]]).filter(Boolean);
+        const base = {
+          name, default_code: sizes.length === 1 || new Set(sizes.map((z) => z[1])).size === 1 ? (sizes[0] || [])[1] || false : false,
+          list_price: Number(price) || 0, sale_ok: true, purchase_ok: false, type: 'consu', is_storable: false,
+          taxes_id: [[6, 0, []]], categ_id: pcat[lcat || ''], website_ribbon_id: false,
+          is_published: live, public_categ_ids: [[6, 0, live ? [foot] : []]], website_sequence: 1000 + order.indexOf(lid),
+          allow_out_of_stock_order: true, show_availability: false, description_sale: false,
+          description: `<p>Loaded from Friction's Loyverse on ${esc(checked)} (Loyverse item ${lid}, POS name "${esc(pos)}", category "${esc(lcat || 'none')}"). SKUs in stock that day: ${esc(skus.join(', ') || 'none')}. Prices and sizes do not update by themselves.</p>`,
+          website_meta_title: `${name} | Friction Clothing Barbados`,
+          website_meta_description: `${name} at Friction Clothing, The Dome Mall, Warrens, Barbados. BBD $${Number(price).toFixed(2)}. Message Friction to check your size before you visit.`,
+        };
+        if (live) base.image_1920 = await fetchB64(`loyverse-photos/${photo}`);
+        const vals = pick(T, base);
+        const key = 'lv_item_' + lid;
+        let id = await xid(key, T);
+        if (id) { await rpc(T, 'write', [[id], vals]); out.updated.push(name); }
+        else { id = idOf(await rpc(T, 'create', [vals])); await setXid(key, T, id); out.created.push(name); }
+        const lines = await rpc('product.template.attribute.line', 'search', [[['product_tmpl_id', '=', id]]]);
+        const cmds = lines.map((l) => [2, l]);
+        if (sizeVals.length) cmds.push([0, 0, { attribute_id: attr.id, value_ids: [[6, 0, sizeVals]] }]);
+        if (cmds.length) await rpc(T, 'write', [[id], { attribute_line_ids: cmds }]);
+        if (live) out.published.push(name);
+      } catch (e) { out.errors.push(lid + ': ' + short(e)); }
+    }
+    out.next = offset + limit < items.length ? offset + limit : null;
     return out;
   };
 

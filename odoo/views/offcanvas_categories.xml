@@ -1,7 +1,7 @@
 <data name="Friction filter panel: close button and categories">
   <xpath expr="//div[@id='o_wsale_offcanvas_content']" position="before">
     <div class="fr-oc-head">
-      <span class="fr-oc-title">Filter looks</span>
+      <span class="fr-oc-title">Filter</span>
       <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close filters"/>
     </div>
   </xpath>
