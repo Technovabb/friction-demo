@@ -373,6 +373,8 @@
     if (!wh) throw new Error('No warehouse to collect from.');
     const bb = (await rpc('res.country', 'search', [[['code', '=', 'BB']]]))[0];
     out.storeAddress = await writeSafe('res.partner', [idOf(wh.partner_id)], { street: 'The Dome Mall', street2: 'Warrens', city: 'St. Michael', country_id: bb, phone: '+1 246-622-1748' });
+    // Many customers don't know their Barbados postcode: optional at checkout (Juwan, 27 Nov 2026). Odoo 20 field; older versions use zip_required.
+    out.postcode = await writeSafe('res.country', [bb], { zip_applicability: 'optional' });
     const pub = has(D, 'is_published') ? 'is_published' : 'website_published';
     const stores = await rpc(D, 'search_read', [[['delivery_type', '=', 'in_store']]], { fields: ['id', 'name'], context: { active_test: false } });
     if (!stores.length) throw new Error('No in-store pickup method found after installing Click & Collect.');
