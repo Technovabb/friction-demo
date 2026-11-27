@@ -1,8 +1,8 @@
-<data name="Friction enquiry received">
+<data name="Friction order received">
   <xpath expr="//h3[contains(., 'Thank you for your order')]" position="replace">
     <div class="fr-thanks">
-      <h3>Thank you. Your enquiry is in.</h3>
-      <p>Friction will contact you to confirm availability, sizes and price. No payment has been taken.</p>
+      <h3>Thank you. Your order is in.</h3>
+      <p>Friction will get your items ready and contact you when your order can be collected at The Dome Mall, Warrens. Please bring your order number.</p>
     </div>
   </xpath>
 </data>

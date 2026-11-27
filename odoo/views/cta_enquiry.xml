@@ -1,34 +1,29 @@
 <data name="Friction enquiry call to action">
+  <!-- Styled looks have no price, so Odoo blocks the cart for them ("Hide Add To Cart" for 0 price products).
+       This block replaces Odoo's Contact Us button and only shows when the cart is blocked. -->
   <xpath expr="//div[@id='contact_us_wrapper']" position="replace">
-    <div id="contact_us_wrapper" class="d-flex flex-column w-100 gap-3 fr-cta">
-      <t t-if="product.list_price">
-        <t t-set="fr_checked" t-value="request.env['ir.config_parameter'].sudo().get_param('friction.stock_checked', '')"/>
-        <t t-set="fr_size_line" t-value="product.attribute_line_ids.filtered_domain([('attribute_id.name', '=', 'Size (in store)')])"/>
-        <div t-if="fr_size_line" class="fr-size">
-          <label class="fr-size-label" t-attf-for="fr-size-#{product.id}">Size — in stock<t t-if="fr_checked"> on <t t-out="fr_checked"/></t></label>
-          <select class="form-select fr-size-select" t-attf-id="fr-size-#{product.id}">
-            <option value="" selected="selected">Select a size</option>
-            <t t-foreach="fr_size_line.value_ids" t-as="fr_v"><option t-att-value="fr_v.name" t-out="fr_v.name"/></t>
-          </select>
-          <p class="fr-size-help">Choosing a size adds it to your message so the team can check it for you.</p>
-        </div>
-        <a class="btn btn-primary w-100 fr-check" href="https://wa.me/12466221748" target="_blank" rel="noopener" t-att-data-look="product.name" t-att-data-sku="product.default_code or None" data-item="1">Check Availability</a>
-      </t>
-      <t t-else="">
-        <div class="fr-size">
-          <label class="fr-size-label" t-attf-for="fr-size-#{product.id}">Size — availability to confirm</label>
-          <select class="form-select fr-size-select" t-attf-id="fr-size-#{product.id}">
-            <option value="" selected="selected">Select a size</option>
-            <option value="S">S</option>
-            <option value="M">M</option>
-            <option value="L">L</option>
-            <option value="XL">XL</option>
-            <option value="2XL">2XL</option>
-          </select>
-          <p class="fr-size-help">Optional. Choosing a size adds it to your message; it does not mean the size is in stock.</p>
-        </div>
-        <a class="btn btn-primary w-100 fr-check" href="https://wa.me/12466221748" target="_blank" rel="noopener" t-att-data-look="product.name">Check Price &amp; Availability</a>
-      </t>
+    <div id="contact_us_wrapper" t-attf-class="{{'d-flex' if combination_info['prevent_sale'] else 'd-none'}} flex-column w-100 gap-3 fr-cta">
+      <div class="fr-size">
+        <label class="fr-size-label" t-attf-for="fr-size-#{product.id}">Size — availability to confirm</label>
+        <select class="form-select fr-size-select" t-attf-id="fr-size-#{product.id}">
+          <option value="" selected="selected">Select a size</option>
+          <option value="S">S</option>
+          <option value="M">M</option>
+          <option value="L">L</option>
+          <option value="XL">XL</option>
+          <option value="2XL">2XL</option>
+        </select>
+        <p class="fr-size-help">Optional. Choosing a size adds it to your message; it does not mean the size is in stock.</p>
+      </div>
+      <a class="btn btn-primary w-100 fr-check" href="https://wa.me/12466221748" target="_blank" rel="noopener" t-att-data-look="product.name">Check Price &amp; Availability</a>
+    </div>
+  </xpath>
+  <!-- Store items: when the chosen size is sold out, Odoo hides Add to cart and shows this block instead.
+       Odoo's own Notify me buttons stay in the page (its script uses them) but are hidden by the site CSS. -->
+  <xpath expr="//div[@id='out_of_stock_buttons_wrapper']" position="inside">
+    <div class="fr-oos w-100">
+      <a class="btn btn-primary w-100 fr-check" href="https://wa.me/12466221748" target="_blank" rel="noopener" t-att-data-look="product.name" data-item="1">Sold Out Online · Ask on WhatsApp</a>
+      <button type="button" class="fr-btn fr-btn-outline fr-bag-add w-100" t-att-data-pid="product.id" t-att-data-look="product.name" t-att-data-url="product.website_url" t-attf-data-img="/web/image/product.template/#{product.id}/image_256" t-att-data-price="product.list_price or None">Add to Enquiry List</button>
     </div>
   </xpath>
 </data>

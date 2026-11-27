@@ -2,18 +2,17 @@
   <xpath expr="//div[@id='o_wsale_product_cta_section']" position="after">
     <t t-set="fr_item" t-value="bool(product.list_price)"/>
     <t t-set="fr_checked" t-value="request.env['ir.config_parameter'].sudo().get_param('friction.stock_checked', '') if fr_item else ''"/>
-    <t t-set="fr_sizes" t-value="product.attribute_line_ids.filtered_domain([('attribute_id.name', '=', 'Size (in store)')]).value_ids if fr_item else False"/>
     <div class="fr-pextra">
-      <div class="fr-pbtns">
-        <a class="fr-btn fr-btn-wa fr-wa-look" href="https://wa.me/12466221748" target="_blank" rel="noopener" t-att-data-look="product.name" t-att-data-sku="(fr_item and product.default_code) or None">Chat on WhatsApp</a>
-        <button type="button" class="fr-btn fr-btn-outline fr-bag-add" t-att-data-pid="product.id" t-att-data-look="product.name" t-att-data-url="product.website_url" t-attf-data-img="/web/image/product.template/#{product.id}/image_256" t-att-data-sku="(fr_item and product.default_code) or None" t-att-data-price="product.list_price or None">Add to Enquiry Bag</button>
+      <div t-attf-class="fr-pbtns #{'fr-pbtns-one' if fr_item else ''}">
+        <a class="fr-btn fr-btn-wa fr-wa-look" href="https://wa.me/12466221748" target="_blank" rel="noopener" t-att-data-look="product.name">Chat on WhatsApp</a>
+        <button t-if="not fr_item" type="button" class="fr-btn fr-btn-outline fr-bag-add" t-att-data-pid="product.id" t-att-data-look="product.name" t-att-data-url="product.website_url" t-attf-data-img="/web/image/product.template/#{product.id}/image_256">Add to Enquiry List</button>
       </div>
       <p class="fr-bag-msg" role="status" aria-live="polite"></p>
       <div class="fr-acc">
         <details>
           <summary>Product Details</summary>
           <div t-if="fr_item">
-            <p><t t-out="product.name"/><t t-if="product.default_code"> · SKU <t t-out="product.default_code"/></t></p>
+            <p t-out="product.name"/>
             <p>For brand, material, fit and care details, message Friction.</p>
           </div>
           <div t-else="">
@@ -24,14 +23,15 @@
         <details>
           <summary>Sizing</summary>
           <div t-if="fr_item">
-            <p t-if="fr_sizes">Sizes in stock at the store<t t-if="fr_checked"> on <t t-out="fr_checked"/></t>: <t t-out="', '.join(fr_sizes.mapped('name'))"/>.</p>
-            <p>Stock changes quickly. Message Friction to confirm your size before you visit.</p>
+            <p>Choose your size above. A size that is sold out online can't be added to the cart: message Friction and the team will check the shelf for you.</p>
+            <p t-if="fr_checked">Website stock was last updated from the store on <t t-out="fr_checked"/>.</p>
           </div>
           <div t-else=""><p>Sizes are confirmed when Friction replies to your enquiry. Choose a size above to include it in your message, or ask about available sizes.</p></div>
         </details>
         <details>
-          <summary>Collection &amp; Delivery</summary>
-          <div><p>Friction confirms collection and delivery options when they reply to your enquiry. The store is at The Dome Mall, Warrens, Barbados. No payment is taken online.</p></div>
+          <summary>Collection &amp; Payment</summary>
+          <div t-if="fr_item"><p>Order online and collect from Friction at The Dome Mall, Warrens, Barbados. Friction will contact you when your order is ready to collect. Pay when you collect.</p></div>
+          <div t-else=""><p>Styled looks are enquiry only. Friction confirms the pieces, sizes and prices when they reply. The store is at The Dome Mall, Warrens, Barbados.</p></div>
         </details>
       </div>
     </div>

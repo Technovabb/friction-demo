@@ -1,4 +1,5 @@
-<!-- Friction: WhatsApp enquiries and the Enquiry Bag (Tech Nova). Builds wa.me links and keeps the bag in this browser only; sends nothing by itself. -->
+<!-- Friction: WhatsApp enquiries and the Enquiry List (Tech Nova). Builds wa.me links and keeps the list in this browser only; sends nothing by itself.
+     Since 26 Nov 2026 Odoo's own cart and checkout handle orders (click and collect); the Enquiry List is for styled looks and sold-out sizes. -->
 <script>
 (function () {
   'use strict';
@@ -18,6 +19,17 @@
   function updateCount() {
     var n = load().length;
     document.querySelectorAll('.fr-bag-count').forEach(function (b) { b.textContent = n; b.classList.toggle('d-none', !n); });
+    // the header Enquiry List link only shows once something is in it
+    document.querySelectorAll('.fr-enq-li').forEach(function (li) { li.classList.toggle('d-none', !n); });
+  }
+  // The size chosen in Odoo's size picker (store items with real sizes)
+  function odooSize() {
+    var root = document.querySelector('.js_add_cart_variants'); if (!root) return '';
+    var s = root.querySelector('select.js_variant_change');
+    if (s && s.selectedOptions && s.selectedOptions[0]) return (s.selectedOptions[0].getAttribute('data-value-name') || s.selectedOptions[0].textContent || '').trim();
+    var i = root.querySelector('input.js_variant_change:checked'); if (!i) return '';
+    var lab = i.id ? root.querySelector('label[for="' + i.id + '"]') : null;
+    return (i.getAttribute('data-value-name') || (lab && lab.textContent) || '').trim();
   }
 
   function renderBag(host, emptyHtml) {
@@ -30,19 +42,19 @@
       var url = esc(localPath(it.url)), img = esc(localPath(it.img)), price = money(it.price);
       return '<li class="fr-bag-item">'
         + '<a class="fr-bag-img" href="' + url + '"><img src="' + img + '" alt="' + esc(it.name) + '" loading="lazy"/></a>'
-        + '<div class="fr-bag-info"><span class="fr-look-tag">' + (price ? 'In store' : 'Styled Look') + '</span><a href="' + url + '">' + esc(it.name) + '</a>'
+        + '<div class="fr-bag-info"><span class="fr-look-tag">' + (price ? 'Store item' : 'Styled Look') + '</span><a href="' + url + '">' + esc(it.name) + '</a>'
         + '<p>' + (price
           ? (it.size ? 'Size ' + esc(it.size) : 'Size not chosen') + (it.sku ? ' · SKU ' + esc(it.sku) : '') + ' · ' + esc(price)
           : (it.size ? 'Size ' + esc(it.size) + ' (availability to confirm)' : 'Size not chosen') + ' · Price on request') + '</p></div>'
-        + '<button type="button" class="fr-bag-remove" data-i="' + i + '" aria-label="Remove ' + esc(it.name) + ' from your Enquiry Bag">Remove</button>'
+        + '<button type="button" class="fr-bag-remove" data-i="' + i + '" aria-label="Remove ' + esc(it.name) + ' from your Enquiry List">Remove</button>'
         + '</li>';
     }).join('') + '</ul>'
       + '<div class="fr-bag-actions">'
-      + '<a class="fr-btn fr-btn-red" target="_blank" rel="noopener" href="' + esc(waLink(text)) + '">Send my Enquiry Bag on WhatsApp</a>'
+      + '<a class="fr-btn fr-btn-red" target="_blank" rel="noopener" href="' + esc(waLink(text)) + '">Send my Enquiry List on WhatsApp</a>'
       + '<a class="fr-btn fr-btn-outline" href="/shop">Keep browsing</a>'
-      + '<button type="button" class="fr-bag-clear">Clear bag</button>'
+      + '<button type="button" class="fr-bag-clear">Clear list</button>'
       + '</div>'
-      + '<p class="fr-bag-note">Your Enquiry Bag is saved in this browser only. Nothing is sent until you tap Send.</p>';
+      + '<p class="fr-bag-note">Your Enquiry List is saved in this browser only. Nothing is sent until you tap Send. To buy items that are in stock, use the cart.</p>';
     host.querySelectorAll('.fr-bag-remove').forEach(function (b) {
       b.addEventListener('click', function () {
         var list = load(); list.splice(parseInt(b.getAttribute('data-i'), 10), 1);
@@ -57,14 +69,12 @@
     if (document.body.classList.contains('editor_enable')) return;
     var path = location.pathname.replace(/\/+$/, '') || '/';
 
-    // Enquiry-only: Odoo's cart and checkout pages send visitors to the Enquiry Bag
-    if (/^\/shop\/(cart|checkout|address|payment|extra_info|confirm_order)(\/|$)/.test(path)) { location.replace('/enquiry-bag'); return; }
-
     updateCount();
-    var isProduct = !!document.querySelector('.fr-check');
+    var isProduct = !!document.getElementById('product_detail');
+    var isCheckout = /^\/shop\/(cart|checkout|address|payment|extra_info|confirm_order|confirmation)(\/|$)/.test(path);
 
-    // Floating WhatsApp button, except on pages that already have their own WhatsApp buttons
-    if (!isProduct && path !== '/enquiry-bag' && !document.querySelector('.fr-wa-float')) {
+    // Floating WhatsApp button, except on pages that already have their own WhatsApp buttons, and in the checkout
+    if (!isProduct && !isCheckout && path !== '/enquiry-bag' && !document.querySelector('.fr-wa-float')) {
       var f = document.createElement('a');
       f.className = 'fr-wa-float';
       f.href = waLink('Hi Friction, I’m on your website and would like some help.');
@@ -80,11 +90,11 @@
       a.href = waLink('Hi Friction, I’m interested in the ' + detail(a.getAttribute('data-look') || 'look', '', a.getAttribute('data-sku')) + ' from your website. ' + (item ? ASK_ITEM : ASK));
     });
 
-    // Product page: the optional size goes into every message; no size is chosen for the shopper
+    // Product page: the size (looks: our optional list; store items: Odoo's size picker) goes into every message
     if (isProduct) {
       var sel = document.querySelector('.fr-size-select');
       if (sel) sel.value = '';
-      var size = function () { return sel && sel.value ? sel.value : ''; };
+      var size = function () { return sel && sel.value ? sel.value : odooSize(); };
       var refresh = function () {
         document.querySelectorAll('.fr-check').forEach(function (a) {
           var item = a.hasAttribute('data-item');
@@ -96,6 +106,8 @@
       };
       refresh();
       if (sel) sel.addEventListener('change', refresh);
+      var picker = document.querySelector('.js_add_cart_variants');
+      if (picker) picker.addEventListener('change', function () { setTimeout(refresh, 50); });
       // Odoo rewrites its contact button link after load, so set ours again then and on every press
       window.addEventListener('load', function () { setTimeout(refresh, 300); });
       document.querySelectorAll('.fr-check, .fr-wa-look').forEach(function (a) { a.addEventListener('pointerdown', refresh); a.addEventListener('click', refresh); });
@@ -105,9 +117,9 @@
           var exists = items.some(function (it) { return it.id === id && it.size === s; });
           if (!exists) items.push({ id: id, name: b.getAttribute('data-look'), url: b.getAttribute('data-url'), img: b.getAttribute('data-img'), size: s, sku: b.getAttribute('data-sku') || '', price: b.getAttribute('data-price') || '' });
           var msg = document.querySelector('.fr-bag-msg');
-          if (!store(items)) { if (msg) msg.textContent = 'This browser could not save your bag. Use the WhatsApp button instead.'; return; }
+          if (!store(items)) { if (msg) msg.textContent = 'This browser could not save your list. Use the WhatsApp button instead.'; return; }
           updateCount();
-          if (msg) msg.innerHTML = (exists ? 'Already in your Enquiry Bag. ' : 'Added to your Enquiry Bag' + (s ? ' (size ' + esc(s) + ')' : '') + '. ') + '<a href="/enquiry-bag">View bag</a>';
+          if (msg) msg.innerHTML = (exists ? 'Already in your Enquiry List. ' : 'Added to your Enquiry List' + (s ? ' (size ' + esc(s) + ')' : '') + '. ') + '<a href="/enquiry-bag">View list</a>';
         });
       });
     }

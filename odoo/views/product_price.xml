@@ -1,10 +1,9 @@
 <data name="Friction product price">
   <xpath expr="//div[@name='product_price']" position="after">
     <t t-if="product.list_price">
-      <t t-set="fr_checked" t-value="request.env['ir.config_parameter'].sudo().get_param('friction.stock_checked', '')"/>
       <div class="fr-por fr-price">BBD $<span t-out="product.list_price" t-options="{'widget': 'float', 'precision': 2}"/></div>
-      <p class="fr-avail fr-avail-in"><span class="fr-dot" aria-hidden="true"></span>In stock at the store<t t-if="fr_checked"> on <t t-out="fr_checked"/></t></p>
-      <p class="fr-disclaimer">Stock changes quickly. Message Friction to confirm your size before you visit. No payment is taken online.</p>
+      <p class="fr-avail fr-avail-in"><span class="fr-dot" aria-hidden="true"></span>Order online · Collect at The Dome Mall</p>
+      <p class="fr-disclaimer">Choose your size, add it to your cart and check out. Collect your order from Friction at The Dome Mall, Warrens, and pay when you collect.</p>
     </t>
     <t t-else="">
       <div class="fr-por">Price on request</div>

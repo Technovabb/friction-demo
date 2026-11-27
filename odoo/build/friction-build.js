@@ -19,7 +19,7 @@
   const W = window;
   const prev = W.FRB || {};
   const FRB = (W.FRB = {});
-  FRB.VERSION = '1.1.0 (2026-11-26)';
+  FRB.VERSION = '1.2.0 (2026-11-26, online ordering)';
   FRB.BASE = prev.BASE || W.FRB_BASE || 'https://technovabb.com/friction-demo/odoo/';
   const MOD = 'friction_demo';
 
@@ -36,19 +36,20 @@
     insta: 'https://www.instagram.com/frictionclothingbarbados/', footwear: 'https://www.instagram.com/frictionfootwear/',
   };
   FRB.text = Object.assign({
-    carrierName: 'Collection or delivery: to be confirmed',
-    carrierDesc: 'Friction will contact you to confirm availability, sizes and price, and how you would like to collect. No payment is taken online.',
+    // Online ordering since 26 Nov 2026: click and collect at the store, pay when collecting (card online to follow)
+    carrierName: 'Collect at Friction, The Dome Mall',
+    carrierDesc: 'Collect your order from Friction at The Dome Mall, Warrens, St. Michael. Friction will contact you when it is ready.',
+    payOnSiteName: 'Pay when you collect',
     // A step's main_button_label is the text of the button that leads TO that step.
-    // The last button (on /shop/payment) reads the company's free_order_label, because every cart is $0.
-    freeOrderLabel: 'Send enquiry',
+    // free_order_label only shows on $0 carts, which can't happen now (unpriced looks can't be added to the cart).
+    freeOrderLabel: 'Confirm Order',
     shopTitle: 'Men’s Streetwear in Barbados | Friction Clothing',
     shopDesc: 'Shop men’s streetwear, graphic tees, denim, statement sets and footwear from Friction Clothing at The Dome Mall in Warrens, Barbados.',
-    emailSubject: "Your Friction enquiry {{ object.name or '' }}",
     steps: {
-      '/shop/cart': { name: 'Enquiry bag', main_button_label: 'Continue' },
+      '/shop/cart': { name: 'Cart', main_button_label: 'Continue' },
       '/shop/address': { name: 'Your details', main_button_label: false },
-      '/shop/checkout': { name: 'Your details', main_button_label: 'Continue' },
-      '/shop/payment': { name: 'Send enquiry', main_button_label: 'Continue' },
+      '/shop/checkout': { name: 'Collection', main_button_label: 'Checkout' },
+      '/shop/payment': { name: 'Payment', main_button_label: 'Continue' },
     },
   }, W.FRB_TEXT || {}); // wording overrides only from window.FRB_TEXT, so reloading the kit always picks up new defaults
 
@@ -213,13 +214,13 @@
       classes = classes.replace(/\bo_wsale_products_opt_(has_wishlist|wishlist_fixed|wishlist_inline|has_comparison)\b/g, '').replace(/\s+/g, ' ');
     }
     const share = await fetchB64('images/share-1200x630.jpg');
-    // Enquiry-only for priced store items too: "Hide Add To Cart" for every shop category (since 26 Nov 2026)
-    const pcats = await rpc('product.public.category', 'search', [[]]);
+    // Online ordering (since 26 Nov 2026): everything with a price can be bought; "Hide Add To Cart" only for
+    // 0-price products, i.e. the styled looks, which stay WhatsApp enquiries until they have prices
     const vals = pick('website', {
       name: BIZ.site, tz: 'America/Barbados', configurator_done: true, cookies_bar: false,
       shop_ppg: 20, shop_ppr: 4, shop_default_sort: 'website_sequence asc', account_on_checkout: 'optional',
-      ecommerce_access: 'everyone', prevent_sale: true, prevent_sale_for: 'specific_categories',
-      prevent_sale_for_categories: [[6, 0, pcats]], contact_us_link_url: '/visit-us',
+      ecommerce_access: 'everyone', prevent_sale: true, prevent_sale_for: 'zero_price',
+      prevent_sale_for_categories: [[5, 0, 0]], contact_us_link_url: '/visit-us',
       auth_signup_uninvited: 'b2b', // accounts by invitation only: no "Don't have an account?" on the sign-in page
       product_page_image_ratio: 'auto', product_page_image_ratio_mobile: 'auto', product_page_image_width: '50_pc',
       social_default_image: share, robots_txt: 'User-agent: *\nDisallow: /',
@@ -356,19 +357,40 @@
   };
 
   // ------------------------------------------------------------------ enquiry flow: delivery method, checkout wording, options
+  // Click and collect (since 26 Nov 2026): Odoo's Click & Collect app gives "pick up in store" delivery and "pay on site".
+  // Card payment online needs Friction's own payment account (they sign up and connect it themselves); add it as a second provider then.
   FRB.delivery = async () => {
     need();
-    const D = 'delivery.carrier', T = 'product.template', P = 'product.product', out = {};
-    const pt = await upsert('delivery_product', T, pick(T, { name: FRB.text.carrierName, type: 'service', list_price: 0, sale_ok: false, purchase_ok: false }));
-    const pp = (await rpc(P, 'search', [[['product_tmpl_id', '=', pt.id]]], { context: { active_test: false } }))[0];
+    const D = 'delivery.carrier', P = 'payment.provider', M = 'ir.module.module', out = {};
+    const mod = (await rpc(M, 'search_read', [[['name', '=', 'website_sale_collect']]], { fields: ['state'] }))[0];
+    if (!mod) throw new Error('Click & Collect (website_sale_collect) is not available on this database.');
+    if (mod.state !== 'installed') {
+      await rpc(M, 'button_immediate_install', [[mod.id]]);
+      return { installed: 'website_sale_collect', next: 'Reload this tab, load the kit, run introspect, then run delivery again.' };
+    }
+    // The store address customers see at checkout is the warehouse's address (here the company's)
+    const wh = (await rpc('stock.warehouse', 'search_read', [[['company_id', '=', FRB.cfg.companyId || 1]]], { fields: ['id', 'partner_id'], limit: 1 }))[0];
+    if (!wh) throw new Error('No warehouse to collect from.');
+    const bb = (await rpc('res.country', 'search', [[['code', '=', 'BB']]]))[0];
+    out.storeAddress = await writeSafe('res.partner', [idOf(wh.partner_id)], { street: 'The Dome Mall', street2: 'Warrens', city: 'St. Michael', country_id: bb, phone: '+1 246-622-1748' });
     const pub = has(D, 'is_published') ? 'is_published' : 'website_published';
-    const vals = pick(D, { name: FRB.text.carrierName, delivery_type: 'fixed', fixed_price: 0, product_id: pp, [pub]: true,
-      carrier_description: FRB.text.carrierDesc, website_description: FRB.text.carrierDesc, sequence: 1, active: true });
-    const res = await upsert('carrier_tbc', D, vals);
-    out.carrier = res.created ? 'created' : 'updated';
-    const others = await rpc(D, 'search_read', [[['id', '!=', res.id], [pub, '=', true]]], { fields: ['name'] });
+    const stores = await rpc(D, 'search_read', [[['delivery_type', '=', 'in_store']]], { fields: ['id', 'name'], context: { active_test: false } });
+    if (!stores.length) throw new Error('No in-store pickup method found after installing Click & Collect.');
+    const store = stores[0];
+    const sv = pick(D, { name: FRB.text.carrierName, [pub]: true, active: true, sequence: 1, website_id: false,
+      carrier_description: FRB.text.carrierDesc, website_description: FRB.text.carrierDesc });
+    out.carrier = await writeSafe(D, [store.id], Object.assign(sv, { warehouse_ids: [[6, 0, [wh.id]]] }));
+    const others = await rpc(D, 'search_read', [[['id', '!=', store.id], [pub, '=', true]]], { fields: ['name'] });
     if (others.length) await rpc(D, 'write', [others.map((o) => o.id), { [pub]: false }]);
     out.unpublished = others.map((o) => o.name);
+    // Pay on site: the only payment method until card payment is connected
+    const pf = await rpc(P, 'fields_get', [], { attributes: ['type', 'selection'] });
+    const onSite = await rpc(P, 'search_read', [[['code', '=', 'custom'], ['custom_mode', '=', 'on_site']]], { fields: ['id', 'name'], context: { active_test: false } });
+    if (!onSite.length) throw new Error('No "pay on site" payment provider found after installing Click & Collect.');
+    const pv = { name: FRB.text.payOnSiteName, is_published: true };
+    if (pf.state) pv.state = 'enabled';
+    if (pf.active) pv.active = true;
+    out.payOnSite = await writeSafe(P, [onSite[0].id], pv);
     return out;
   };
 
@@ -398,14 +420,8 @@
     if (!r.length) throw new Error('sale.mail_template_sale_confirmation not found');
     return r[0].res_id;
   }
-  FRB.email = async () => {
-    need();
-    const id = await confirmationTemplate();
-    const body = (await fetchText('email/enquiry-confirmation.html')).trim();
-    checkXml(body, 'email/enquiry-confirmation.html');
-    const errs = await writeSafe('mail.template', [id], pick('mail.template', { subject: FRB.text.emailSubject, body_html: body }));
-    return { template: id, result: errs.length ? errs : 'ok' };
-  };
+  // Real orders since 26 Nov 2026: customers get Odoo's own order confirmation email (the enquiry version is retired)
+  FRB.email = async () => FRB.resetEmail();
   FRB.resetEmail = async () => {
     need();
     const id = await confirmationTemplate();
@@ -440,6 +456,11 @@
     const list = await fetchJSON('views/views.json'), out = { done: [], errors: [] };
     for (const v of list) {
       if (only && only !== v.key) continue;
+      if (v.retired) { // switched off (archived, not deleted)
+        const ids = await rpc('ir.ui.view', 'search', [[['key', '=', 'website.' + v.key], ['website_id', '=', wid()]]]);
+        if (ids.length) { await rpc('ir.ui.view', 'write', [ids, { active: false }]); out.done.push(v.key + ' archived'); }
+        continue;
+      }
       try {
         const arch = (await fetchText('views/' + v.file)).trim();
         checkXml(arch, v.file);
@@ -721,7 +742,7 @@
     let attr = sizeX.length ? { id: sizeX[0].res_id } : null;
     if (!attr) attr = await upsert('attr_size', A, pick(A, { name: 'Size', create_variant: 'always', display_type: 'pills' }));
     await rpc(A, 'write', [[attr.id], pick(A, { create_variant: 'always', display_type: 'pills', visibility: 'visible' })]);
-    const stockLoc = (await rpc('stock.warehouse', 'search_read', [[['company_id', '=', FRB.cfg.company || 1]]], { fields: ['lot_stock_id'], limit: 1 }))[0];
+    const stockLoc = (await rpc('stock.warehouse', 'search_read', [[['company_id', '=', FRB.cfg.companyId || 1]]], { fields: ['lot_stock_id'], limit: 1 }))[0];
     if (!stockLoc) throw new Error('No warehouse found for the stock counts.');
     const LOC = idOf(stockLoc.lot_stock_id);
     const allSizes = [...new Set(items.flatMap((it) => (it[4] || []).map((z) => z[0]).filter(Boolean)))]
@@ -834,7 +855,9 @@
         if (!/noindex/.test((d.querySelector('meta[name="robots"]') || {}).content || '')) problems.push(`${u}: noindex missing`);
         if (!(d.querySelector('meta[name="description"]') || {}).content) problems.push(`${u}: no meta description`);
         if (d.querySelector('a[href^="/web/login"]')) problems.push(`${u}: Sign in link`);
-        if (d.querySelector('a[href="/shop/cart"], a[href^="/shop/checkout"], #add_to_cart_wrap:not(.d-none), .o_add_wishlist, .o_add_compare')) problems.push(`${u}: cart, wishlist or compare control`);
+        if (d.querySelector('.o_add_wishlist, .o_add_compare')) problems.push(`${u}: wishlist or compare control`);
+        // unpriced styled looks must never offer Add to cart
+        if (u === firstProduct && d.querySelector('#add_to_cart_wrap:not(.d-none)')) problems.push(`${u}: Add to cart on a styled look`);
       } catch (e) { pages[u] = short(e); }
     }
     out.publicStatus = pages;

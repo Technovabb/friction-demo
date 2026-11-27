@@ -197,7 +197,16 @@ h2.o_wsale_category_title a{color:var(--fr-red)!important;font-weight:700;text-d
 .fr-size-select{border-radius:0!important;border-color:var(--fr-line);min-height:48px;font-weight:600;background-color:#fff}
 .fr-size-help{font-size:12px;color:var(--fr-mute);margin:6px 0 0}
 .fr-check.btn{min-height:54px;display:flex;align-items:center;justify-content:center;font-size:13px!important;text-transform:uppercase;letter-spacing:.1em}
-#add_to_cart_wrap,#product_detail .css_quantity,#product_detail .o_wsale_product_quantity{display:none!important}
+/* Online ordering: Odoo's Add to cart is the main button; sold-out sizes show the WhatsApp enquiry instead of Odoo's Notify me */
+#product_detail #add_to_cart_wrap .btn[name="add_to_cart"]{min-height:54px;border-radius:0!important;font:800 13px/1 var(--fr-sans)!important;text-transform:uppercase;letter-spacing:.1em;background:var(--fr-red)!important;border-color:var(--fr-red)!important;color:#fff!important}
+#product_detail #add_to_cart_wrap .btn[name="add_to_cart"]:hover{background:var(--fr-ink)!important;border-color:var(--fr-ink)!important}
+#product_detail .css_quantity .btn,#product_detail .css_quantity .form-control{border-radius:0!important;min-height:54px}
+#stock_notification_button,#stock_notification_subscribed_button,#stock_notification_wrapper{display:none!important}
+.fr-oos{display:grid;gap:10px}
+.fr-oos .fr-btn{min-height:50px;font-size:11.5px;letter-spacing:.08em}
+.fr-pbtns.fr-pbtns-one{grid-template-columns:1fr}
+#product_detail .availability_messages:empty{display:none}
+#product_detail .availability_messages{font-size:13.5px;font-weight:600;color:var(--fr-red)}
 .fr-pbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .fr-pbtns .fr-btn{width:100%;min-height:50px;padding:0 12px;font-size:11.5px;letter-spacing:.08em}
 .fr-bag-msg{min-height:1.2em;margin:10px 0 0;font-size:13px;font-weight:600}
@@ -209,8 +218,7 @@ div[name="product_price_container"],div[name="product_price"] .oe_price,div[name
 .fr-avail-in .fr-dot{background:#1f9d55}
 .fr-price{color:var(--fr-ink);letter-spacing:.01em}
 .fr-por-card.fr-price{font-size:14px}
-/* Store items: sizes come from our own list; Odoo's variant picker stays hidden */
-#product_detail .js_add_cart_variants{display:none!important}
+/* Store items: Odoo's own size picker (real variants with stock) */
 #product_detail .attribute_name,#product_detail .attribute_name span,#product_detail .variant_attribute .attribute_name,#product_detail .o_variant_attribute_name,#product_detail .variant_attribute strong{font-family:var(--fr-sans)!important;font-size:13px!important;font-weight:800!important;text-transform:none;letter-spacing:0}
 #product_detail .o_variant_pills,#product_detail .btn-check+.btn,#product_detail .o_variant_pills_input_value{border-radius:0!important}
 .fr-pextra{margin-top:4px}
@@ -236,10 +244,8 @@ div[name="product_price_container"],div[name="product_price"] .oe_price,div[name
 .fr-bag-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:26px}
 .fr-bag-note{font-size:12.5px;color:var(--fr-mute);margin:14px 0 0}
 
-/* ---------- enquiry bag + checkout: hide money, keep the flow ---------- */
-#wrapwrap :is(span,strong,small,b,del,bdi,div):has(> .oe_currency_value){display:none!important}
-.o_wsale_delivery_price_badge,tr[name="o_order_delivery"],tr[name="o_order_total_untaxed"],#order_tax_lines_container,tr[name="o_order_total"],tr[name="o_order_total_taxes"],.coupon_form,#shop_cart div:has(> span > #quick_reorder_button),#shop_cart div:has(> #quick_reorder_button){display:none!important}
-.o_total_card .card-body::before{content:"Prices, sizes and availability are confirmed by Friction after you send your enquiry. No payment is taken online.";display:block;font-size:13.5px;line-height:1.55;color:#4a4641;margin-bottom:14px}
+/* ---------- cart + checkout (real orders since 26 Nov 2026) ---------- */
+.coupon_form,#shop_cart div:has(> span > #quick_reorder_button),#shop_cart div:has(> #quick_reorder_button){display:none!important}
 .fr-bag-wa{margin-top:28px;padding-top:22px;border-top:1px solid var(--fr-line)}
 .fr-bag-wa p{margin:0 0 12px;color:#4a4641}
 .fr-thanks h3{font:400 clamp(30px,3.4vw,44px)/1 var(--fr-display);text-transform:uppercase;margin:0 0 8px}

@@ -1,7 +1,11 @@
 <data name="Friction card call to action">
   <xpath expr="//div[hasclass('o_wsale_product_action_row')]" position="replace">
     <div class="o_wsale_product_action_row">
-      <a t-if="product.list_price" class="btn btn-primary fr-card-cta" href="https://wa.me/12466221748" target="_blank" rel="noopener" t-att-data-look="product.name" t-att-data-sku="product.default_code or None" data-item="1" t-attf-aria-label="Check availability of #{product.name} on WhatsApp">Check Availability</a>
+      <t t-if="product.list_price">
+        <t t-set="fr_free" t-value="sum(product.sudo().product_variant_ids.mapped('free_qty')) if product.is_storable else 1"/>
+        <a t-if="fr_free &gt; 0" class="btn btn-primary fr-card-buy" t-att-href="product.website_url" t-attf-aria-label="Shop #{product.name}">Shop Now</a>
+        <a t-else="" class="btn btn-primary fr-card-cta" href="https://wa.me/12466221748" target="_blank" rel="noopener" t-att-data-look="product.name" data-item="1" t-attf-aria-label="#{product.name} is sold out online: ask Friction on WhatsApp">Sold Out · Ask Us</a>
+      </t>
       <a t-else="" class="btn btn-primary fr-card-cta" href="https://wa.me/12466221748" target="_blank" rel="noopener" t-att-data-look="product.name" t-attf-aria-label="Check price and availability for #{product.name} on WhatsApp">Check Price &amp; Availability</a>
     </div>
   </xpath>

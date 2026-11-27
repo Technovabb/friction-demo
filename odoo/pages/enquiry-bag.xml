@@ -1,15 +1,15 @@
-<section class="fr-pagehero fr-pagehero-sm" data-name="Enquiry Bag title">
+<section class="fr-pagehero fr-pagehero-sm" data-name="Enquiry List title">
   <div class="fr-wrapx">
-    <p class="fr-eyebrow fr-red">Enquiry only · No payment online</p>
-    <h1 class="fr-display">Enquiry Bag</h1>
-    <p class="fr-lead-l">Save the shoes and looks you like, then send them to Friction on WhatsApp. The team will confirm sizes and availability, and prices for the styled looks. No payment is taken online.</p>
+    <p class="fr-eyebrow fr-red">Styled looks · Sold-out sizes</p>
+    <h1 class="fr-display">Enquiry List</h1>
+    <p class="fr-lead-l">Save styled looks and sold-out sizes, then send them to Friction on WhatsApp. The team will confirm sizes, availability and prices. Items in stock can be bought online with the cart.</p>
   </div>
 </section>
-<section class="fr-wrapx fr-bagpage" data-name="Enquiry Bag list">
+<section class="fr-wrapx fr-bagpage" data-name="Enquiry List items">
   <div id="fr-bag" class="fr-bag" aria-live="polite">
     <div class="fr-bag-empty">
-      <h2>Your Enquiry Bag is empty.</h2>
-      <p>Browse the shop and tap Add to Enquiry Bag, or message Friction directly.</p>
+      <h2>Your Enquiry List is empty.</h2>
+      <p>Tap Add to Enquiry List on a styled look or a sold-out size, or message Friction directly.</p>
       <div class="fr-btns">
         <a class="fr-btn fr-btn-red" href="/shop">Browse the shop</a>
         <a class="fr-btn fr-btn-wa" href="https://wa.me/12466221748" target="_blank" rel="noopener">WhatsApp Friction</a>
