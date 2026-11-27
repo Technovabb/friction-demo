@@ -7,7 +7,7 @@
     <attribute name="aria-label">Cart</attribute>
     <attribute name="title">Cart</attribute>
   </xpath>
-  <xpath expr="//li[hasclass('o_wsale_my_cart')]" position="after">
+  <xpath expr="//li[contains(@t-attf-class, 'o_wsale_my_cart')]" position="after">
     <li t-attf-class="fr-enq-li d-none #{_item_class}">
       <a href="/enquiry-bag" t-attf-class="#{_link_class} fr-baglink" aria-label="Enquiry List" title="Enquiry List">
         <div t-attf-class="#{_icon_wrap_class}">
