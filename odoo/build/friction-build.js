@@ -391,6 +391,9 @@
     if (pf.state) pv.state = 'enabled';
     if (pf.active) pv.active = true;
     out.payOnSite = await writeSafe(P, [onSite[0].id], pv);
+    // the checkout shows the payment METHOD's name (Odoo calls it 'Pay on site')
+    const pms = (await rpc(P, 'read', [[onSite[0].id]], { fields: ['payment_method_ids'] }))[0].payment_method_ids;
+    if (pms.length) out.payMethod = await writeSafe('payment.method', pms, { name: FRB.text.payOnSiteName });
     return out;
   };
 

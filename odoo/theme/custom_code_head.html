@@ -245,6 +245,9 @@ div[name="product_price_container"],div[name="product_price"] .oe_price,div[name
 .fr-bag-note{font-size:12.5px;color:var(--fr-mute);margin:14px 0 0}
 
 /* ---------- cart + checkout (real orders since 26 Nov 2026) ---------- */
+/* no wishlist: hide Save for Later in the cart; no "Secured by Custom" line under Pay when you collect */
+#shop_cart .o_add_wishlist,#shop_cart span.text-300:has(+ .o_add_wishlist){display:none!important}
+li:has(input[data-provider-code="custom"]) p[name="o_payment_secured_by"]{display:none!important}
 .coupon_form,#shop_cart div:has(> span > #quick_reorder_button),#shop_cart div:has(> #quick_reorder_button){display:none!important}
 .fr-bag-wa{margin-top:28px;padding-top:22px;border-top:1px solid var(--fr-line)}
 .fr-bag-wa p{margin:0 0 12px;color:#4a4641}
